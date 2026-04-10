@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pro Study - Login</title>
+
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+
+<style>
+:root {
+  --bg-gradient: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #a1c4fd 100%);
+  --card: rgba(255, 255, 255, 0.65); --card-border: rgba(255, 255, 255, 0.6);
+  --text: #1e293b; --sub: #475569;
+  --primary: #6366f1; --primary-hover: #4f46e5;
+  --secondary: #ec4899; 
+  --shadow: 0 8px 32px rgba(31, 38, 135, 0.1);
+  --glass-blur: blur(16px);
+}
+
+body {
+  margin: 0; font-family: 'Segoe UI', system-ui, sans-serif;
+  background: var(--bg-gradient); background-size: 200% 200%;
+  animation: gradientShift 15s ease infinite; color: var(--text);
+  overflow-x: hidden; min-height: 100vh; display: flex; align-items: center; justify-content: center;
+  backface-visibility: hidden; -webkit-font-smoothing: antialiased;
+}
+
+@keyframes gradientShift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+
+.container { width: 100%; max-width: 400px; padding: 20px; }
+
+.card {
+  background: var(--card); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--card-border); padding: 30px; border-radius: 24px;
+  box-shadow: var(--shadow);
+}
+
+input {
+  width: 100%; padding: 12px 16px; border: 1px solid var(--card-border); 
+  border-radius: 12px; background: rgba(0,0,0,0.03); color: var(--text);
+  font-family: inherit; box-sizing: border-box; margin-bottom: 15px;
+  transition: 0.3s ease;
+}
+input:focus { outline: none; border-color: var(--primary); background: transparent; }
+
+.add-btn {
+  width: 100%; padding: 14px; border: none; border-radius: 12px; background: var(--primary);
+  color: #fff; cursor: pointer; font-weight: 600; box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  transition: transform 0.2s ease, background 0.15s ease; margin-bottom: 15px;
+}
+.add-btn:hover { transform: translateY(-2px); background: var(--primary-hover); }
+</style>
+</head>
+
+<body>
+
+<div class="container">
+  <div style="text-align: center; margin-bottom: 25px;">
+    <svg viewBox="0 0 24 24" style="width: 60px; height: 60px; stroke: var(--primary); fill: none; stroke-width: 2; margin-bottom: 10px;">
+      <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
+    </svg>
+    <h1 style="margin: 0; font-size: 32px; letter-spacing: -1px;">Pro Study</h1>
+    <p style="color: var(--sub); margin-top: 5px;">Your Cloud-Sync Dashboard</p>
+  </div>
+
+  <div class="card" id="authCard">
+    <h3 id="authTitle" style="margin-top:0; text-align:center;">Welcome Back</h3>
+    
+    <button class="add-btn" style="background: rgba(255,255,255,0.9); color: #333; border: 1px solid #ccc; display: flex; justify-content: center; align-items: center; gap: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);" onclick="googleLogin()">
+      <svg style="width: 18px; height: 18px;" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+      Continue with Google
+    </button>
+
+    <div style="display: flex; align-items: center; margin-bottom: 15px;">
+        <hr style="flex: 1; border: none; border-top: 1px solid var(--card-border);">
+        <span style="padding: 0 10px; font-size: 12px; color: var(--sub);">OR</span>
+        <hr style="flex: 1; border: none; border-top: 1px solid var(--card-border);">
+    </div>
+
+    <input type="email" id="emailInput" placeholder="Email Address">
+    
+    <div style="position: relative; margin-bottom: 5px;">
+      <input type="password" id="passwordInput" placeholder="Password" style="margin-bottom: 0; padding-right: 40px;" onkeyup="checkPasswordStrength()">
+      <div onclick="togglePasswordVisibility('passwordInput', 'eyeIcon1')" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--sub); display: flex;">
+        <svg id="eyeIcon1" viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>
+        </svg>
+      </div>
+    </div>
+    
+    <div id="forgotPasswordDiv" style="text-align: right; margin-bottom: 15px;">
+       <a href="#" onclick="forgotPassword(); return false;" style="font-size: 11px; color: var(--primary); text-decoration: none; font-weight: bold;">Forgot Password?</a>
+    </div>
+    
+    <div id="passwordHint" style="font-size: 11px; color: var(--secondary); margin-bottom: 10px; display: none;">Minimum 6 chars, 1 number, 1 uppercase.</div>
+    
+    <div id="confirmPasswordWrapper" style="position: relative; margin-bottom: 20px; display: none;">
+      <input type="password" id="confirmPasswordInput" placeholder="Confirm Password" style="margin-bottom: 0; padding-right: 40px;">
+      <div onclick="togglePasswordVisibility('confirmPasswordInput', 'eyeIcon2')" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--sub); display: flex;">
+        <svg id="eyeIcon2" viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>
+        </svg>
+      </div>
+    </div>
+    
+    <button id="authActionBtn" class="add-btn" onclick="login()">Log In</button>
+    
+    <div style="text-align: center; font-size: 13px; color: var(--sub);">
+       <span id="authToggleText">Don't have an account?</span> 
+       <a href="#" onclick="toggleAuthMode(); return false;" style="color: var(--primary); font-weight: bold; text-decoration: none;" id="authToggleLink">Sign Up</a>
+    </div>
+  </div>
+</div>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyB1Ktime-mlICWVxENVE27PtafbrXO96x4",
+  authDomain: "pro-web-app-9fe4e.firebaseapp.com",
+  projectId: "pro-web-app-9fe4e",
+  storageBucket: "pro-web-app-9fe4e.firebasestorage.app",
+  messagingSenderId: "399232879124",
+  appId: "1:399232879124:web:9fa3ca15aaf8b71ec43501"
+};
+firebase.initializeApp(firebaseConfig);
+
+// THE BOUNCER: If already logged in, skip this page and go to dashboard
+firebase.auth().onAuthStateChanged((user) => {
+  if (user) {
+    window.location.href = "dashboard.html"; // Redirects to your app
+  }
+});
+
+let isSignupMode = false;
+
+window.togglePasswordVisibility = function(inputId, iconId) {
+  const input = document.getElementById(inputId);
+  const icon = document.getElementById(iconId);
+  if (input.type === "password") {
+    input.type = "text";
+    icon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>';
+  } else {
+    input.type = "password";
+    icon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>';
+  }
+};
+
+window.toggleAuthMode = function() {
+    isSignupMode = !isSignupMode;
+    document.getElementById("emailInput").value = "";
+    document.getElementById("passwordInput").value = "";
+    document.getElementById("confirmPasswordInput").value = "";
+    document.getElementById("passwordHint").style.display = "none";
+    document.getElementById("passwordInput").type = "password";
+    document.getElementById("confirmPasswordInput").type = "password";
+    document.getElementById("eyeIcon1").innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>';
+
+    if(isSignupMode) {
+        document.getElementById("authTitle").innerText = "Create Account";
+        document.getElementById("confirmPasswordWrapper").style.display = "block"; 
+        document.getElementById("forgotPasswordDiv").style.display = "none"; 
+        document.getElementById("authActionBtn").innerText = "Sign Up";
+        document.getElementById("authActionBtn").onclick = signup;
+        document.getElementById("authToggleText").innerText = "Already have an account?";
+        document.getElementById("authToggleLink").innerText = "Log In";
+    } else {
+        document.getElementById("authTitle").innerText = "Welcome Back";
+        document.getElementById("confirmPasswordWrapper").style.display = "none"; 
+        document.getElementById("forgotPasswordDiv").style.display = "block"; 
+        document.getElementById("authActionBtn").innerText = "Log In";
+        document.getElementById("authActionBtn").onclick = login;
+        document.getElementById("authToggleText").innerText = "Don't have an account?";
+        document.getElementById("authToggleLink").innerText = "Sign Up";
+    }
+};
+
+window.checkPasswordStrength = function() {
+  if(!isSignupMode) return; 
+  const val = document.getElementById("passwordInput").value;
+  const hint = document.getElementById("passwordHint");
+  hint.style.display = "block";
+  if(val.length >= 6 && /\d/.test(val) && /[A-Z]/.test(val)) {
+      hint.style.color = "var(--primary)"; hint.innerText = "Strong Password ✓";
+  } else {
+      hint.style.color = "var(--secondary)"; hint.innerText = "Requires: 6+ chars, 1 number, 1 uppercase.";
+  }
+}
+
+window.googleLogin = function() {
+  const provider = new firebase.auth.GoogleAuthProvider();
+  firebase.auth().signInWithPopup(provider).then((result) => {
+      if(result.user.displayName) localStorage.setItem("proNickname", result.user.displayName.split(" ")[0]);
+  }).catch(error => alert("Google Login Failed: " + error.message));
+};
+
+window.forgotPassword = function() {
+  const email = document.getElementById("emailInput").value.trim();
+  if (!email) { alert("Please enter your email address first!"); return; }
+  firebase.auth().sendPasswordResetEmail(email)
+    .then(() => alert("Password reset email sent! Check your inbox."))
+    .catch(error => alert("Error: " + error.message));
+};
+
+window.signup = function() {
+  const email = document.getElementById("emailInput").value;
+  const pass = document.getElementById("passwordInput").value;
+  const conf = document.getElementById("confirmPasswordInput").value;
+  if (!email || !pass) { alert("Enter email and password!"); return; }
+  if (pass !== conf) { alert("Passwords do not match!"); return; }
+  if (pass.length < 6 || !/\d/.test(pass) || !/[A-Z]/.test(pass)) {
+      alert("Password must be at least 6 characters long and include a number and an uppercase letter."); return;
+  }
+  firebase.auth().createUserWithEmailAndPassword(email, pass).catch(error => alert(error.message));
+};
+
+window.login = function() {
+  const email = document.getElementById("emailInput").value;
+  const pass = document.getElementById("passwordInput").value;
+  if (!email || !pass) { alert("Enter email and password!"); return; }
+  firebase.auth().signInWithEmailAndPassword(email, pass).catch(error => alert("Login Failed: " + error.message));
+};
+</script>
+</body>
+</html>

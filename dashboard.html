@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pro Dashboard</title>
+
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+
+<style>
+.time-wrapper { position: relative; }
+.inner-label { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); font-size: 14px; color: var(--sub); pointer-events: none; transition: opacity 0.15s ease; }
+input[type="time"]:focus + .inner-label, input[type="time"]:valid + .inner-label { opacity: 0; }
+input[type="time"] { min-height: 48px; }
+
+:root {
+  --bg-gradient: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #a1c4fd 100%);
+  --card: rgba(255, 255, 255, 0.65); --card-border: rgba(255, 255, 255, 0.6);
+  --text: #1e293b; --sub: #475569;
+  --primary: #6366f1; --primary-hover: #4f46e5;
+  --secondary: #ec4899; 
+  --shadow: 0 8px 32px rgba(31, 38, 135, 0.1);
+  --glass-blur: blur(16px);
+}
+
+.dark {
+  --bg-gradient: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #0f766e 100%);
+  --card: rgba(15, 23, 42, 0.6); --card-border: rgba(255, 255, 255, 0.1);
+  --text: #f8fafc; --sub: #94a3b8;
+  --primary: #0ea5e9; --primary-hover: #0284c7;
+  --secondary: #a855f7; 
+  --shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+body {
+  margin: 0; font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg-gradient); background-size: 200% 200%;
+  animation: gradientShift 15s ease infinite; color: var(--text); overflow-x: hidden; min-height: 100vh;
+  transition: color 0.15s ease, background 0.15s ease; backface-visibility: hidden; -webkit-font-smoothing: antialiased;
+}
+
+@keyframes gradientShift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+@keyframes smoothFade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes slideInRight { from { opacity: 0; transform: translateX(40px); } to { opacity: 1; transform: translateX(0); } }
+@keyframes slideInLeft { from { opacity: 0; transform: translateX(-40px); } to { opacity: 1; transform: translateX(0); } }
+
+.container { max-width: 420px; margin: auto; padding: 20px 16px 160px; }
+
+.theme-toggle {
+  position: absolute; top: 20px; right: 20px; width: 40px; height: 40px; border: 1px solid var(--card-border); border-radius: 50%;
+  background: var(--card); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
+  cursor: pointer; box-shadow: var(--shadow); transition: background 0.15s ease, border-color 0.15s ease, transform 0.3s ease;
+  display: flex; align-items: center; justify-content: center;
+}
+.theme-toggle:hover { transform: rotate(15deg) scale(1.05); }
+.theme-toggle svg { stroke: var(--text); transition: stroke 0.15s ease; }
+
+.page { display: none; }
+.page.active { display: block; animation: smoothFade 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+.page.active.slide-right { animation: slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+.page.active.slide-left { animation: slideInLeft 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+
+.card {
+  background: var(--card); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--card-border); padding: 20px; border-radius: 24px; margin-top: 20px;
+  box-shadow: var(--shadow); transition: background 0.15s ease, border-color 0.15s ease, transform 0.3s ease, box-shadow 0.3s ease;
+}
+.card:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(0,0,0,0.15); }
+
+/* Nav styling visible by default here */
+.nav {
+  position: fixed; bottom: calc(20px + env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%);
+  width: 90%; max-width: 400px; padding: 8px; display: flex; gap: 5px;
+  background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.5); border-radius: 50px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.2); z-index: 100; overflow-x: auto; scrollbar-width: none; 
+}
+.dark .nav { background: rgba(15, 23, 42, 0.35); border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 10px 40px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05); }
+.nav::-webkit-scrollbar { display: none; }
+.nav button { flex: 0 0 auto; min-width: 60px; border: none; background: none; padding: 12px; cursor: pointer; display: flex; justify-content: center; position: relative; z-index: 2; }
+.icon { width: 24px; height: 24px; stroke: var(--sub); fill: none; transition: stroke 0.15s ease; }
+.nav button.active .icon { stroke: #fff; }
+
+.indicator {
+  position: absolute; height: calc(100% - 16px); background: var(--primary); border-radius: 40px;
+  top: 8px; left: 8px; width: 60px; transition: cubic-bezier(0.68, -0.55, 0.265, 1.55) 0.4s; z-index: 1;
+}
+
+.input-group { display: flex; gap: 10px; margin-top: 15px; }
+input, textarea {
+  flex: 1; padding: 12px 16px; border: 1px solid var(--card-border); 
+  border-radius: 12px; background: rgba(0,0,0,0.03); color: var(--text);
+  font-family: inherit; box-sizing: border-box; width: 100%; transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+.dark input, .dark textarea { background: rgba(255,255,255,0.05); }
+input:focus, textarea:focus { outline: none; border-color: var(--primary); background: transparent; }
+
+.add-btn {
+  padding: 12px 20px; border: none; border-radius: 12px; background: var(--primary);
+  color: #fff; cursor: pointer; font-weight: 600; box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  transition: transform 0.2s ease, background 0.15s ease, opacity 0.2s ease;
+}
+.add-btn:hover:not(:disabled) { transform: translateY(-2px); background: var(--primary-hover); }
+.add-btn:active:not(:disabled) { transform: translateY(0); }
+
+.adjust-btn { background: transparent; border: 2px solid var(--primary); border-radius: 20px; padding: 6px 14px; cursor: pointer; color: var(--primary); font-weight: 700; transition: 0.2s ease; }
+.adjust-btn:hover { background: var(--primary); color: #fff; transform: scale(1.05); }
+
+li { background: rgba(0,0,0,0.02); padding: 16px; border-radius: 16px; margin-top: 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(0,0,0,0.03); transition: 0.15s ease; }
+.dark li { background: rgba(255,255,255,0.03); border-color: rgba(255,255,255,0.05); }
+li:hover { background: rgba(0,0,0,0.04); transform: translateX(4px); }
+.dark li:hover { background: rgba(255,255,255,0.06); }
+.completed { opacity: .6; }
+.time { font-size: 12px; color: var(--sub); }
+
+.ring-box { position: relative; width: 140px; margin: 10px auto; }
+.bg { stroke: rgba(0,0,0,0.05); stroke-width: 12; fill: none; transition: stroke 0.15s ease; }
+.dark .bg { stroke: rgba(255,255,255,0.05); }
+.progress-ring { stroke: var(--secondary); stroke-width: 12; fill: none; stroke-dasharray: 314; stroke-dashoffset: 314; transition: stroke-dashoffset 1s cubic-bezier(0.4, 0, 0.2, 1); stroke-linecap: round; }
+.ring-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); font-weight: 700; font-size: 24px; color: var(--secondary); }
+
+.task-toggle { display: flex; gap: 5px; margin-top: 15px; background: rgba(0,0,0,0.04); padding: 6px; border-radius: 20px; position: relative; transition: background 0.15s ease; }
+.dark .task-toggle { background: rgba(255,255,255,0.05); }
+.task-toggle button { flex: 1; border: none; background: none; padding: 10px; color: var(--sub); z-index: 1; cursor: pointer; font-weight: 500; transition: color 0.15s ease; }
+.task-toggle button.active { color: #fff; }
+.toggle-indicator { position: absolute; width: calc(50% - 6px); height: calc(100% - 12px); background: var(--primary); border-radius: 16px; top: 6px; left: 6px; transition: cubic-bezier(0.68, -0.55, 0.265, 1.55) 0.4s; }
+
+#timer { font-size: 42px; font-weight: 800; margin: 0; text-align: center; min-width: 120px; color: var(--primary); letter-spacing: 2px; }
+.sub { color: var(--sub); font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+
+.modal{ position:fixed;top:0;left:0;width:100%;height:100%; display:none;justify-content:center;align-items:center; background:rgba(0,0,0,.4); z-index: 1000; backdrop-filter: blur(5px);}
+.modal-content{background:var(--card);padding:30px;border-radius:24px; border:1px solid var(--card-border); box-shadow: var(--shadow); transition: background 0.15s ease, border-color 0.15s ease;}
+
+.ai-btn{ position:fixed;bottom:90px;right:20px;width:55px;height:55px; border-radius:50%;border:none;background:var(--secondary);color:#fff; cursor:pointer; z-index: 100; box-shadow: 0 10px 25px rgba(0,0,0,0.2); transition: transform 0.3s ease; display:flex; justify-content:center; align-items:center;}
+.ai-btn:hover { transform: scale(1.1); }
+
+.ai-panel{ position:fixed;bottom:0;width:100%;height:65%; background:var(--card); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur); border-top: 1px solid var(--card-border); display:none;flex-direction:column; border-radius:30px 30px 0 0; animation:slideUp .4s cubic-bezier(0.16, 1, 0.3, 1); z-index: 500; box-shadow:0 -10px 40px rgba(0,0,0,0.15); transition: background 0.15s ease, border-color 0.15s ease;}
+@keyframes slideUp{ from{transform:translateY(100%);} to{transform:translateY(0);} }
+.ai-chat{flex:1;overflow:auto;padding:20px;display:flex;flex-direction:column;gap:12px;}
+.msg{padding:12px 16px;border-radius:18px;max-width:80%;font-size:14px; line-height: 1.5; word-wrap: break-word;}
+.user{background:var(--secondary);color:#fff;align-self:flex-end; border-bottom-right-radius: 4px;}
+.ai{background:rgba(0,0,0,.05);align-self:flex-start; border-bottom-left-radius: 4px;}
+.friend {background: var(--primary); color:#fff; align-self:flex-start; border-bottom-left-radius: 4px;}
+.dark .ai{background:rgba(255,255,255,.1);}
+.ai-header{ padding:20px; text-align:center; font-weight:700; font-size: 18px; border-bottom: 1px solid rgba(0,0,0,0.05); position:relative;}
+.dark .ai-header { border-bottom: 1px solid rgba(255,255,255,0.05); }
+.close-ai{ position:absolute; right:20px; top:18px; font-size:24px; cursor:pointer; color: var(--sub); transition:0.2s;}
+.close-ai:hover { color: var(--text); transform: scale(1.1);}
+
+h2 { margin-top: 0; font-weight: 800; letter-spacing: -0.5px;}
+
+.time-input-container { display: flex; gap: 10px; margin-top: 15px; }
+.time-field { flex: 1; position: relative; background: rgba(0,0,0,0.03); border-radius: 12px; border: 1px solid var(--card-border); transition: 0.3s; }
+.dark .time-field { background: rgba(255,255,255,0.05); }
+.time-field input { width: 100%; padding: 20px 12px 8px 12px; background: transparent; border: none; color: var(--text); font-family: inherit; box-sizing: border-box; }
+.time-field label { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-size: 13px; color: var(--sub); pointer-events: none; transition: 0.2s ease all; }
+.time-field input:focus + label, .time-field input:not(:placeholder-shown) + label { top: 12px; font-size: 10px; font-weight: 800; text-transform: uppercase; color: var(--primary); }
+
+.streak-bar { width: 100%; height: 8px; background: rgba(0,0,0,0.05); border-radius: 10px; margin: 15px 0; overflow: hidden; }
+.dark .streak-bar { background: rgba(255,255,255,0.05); }
+.streak-fill { height: 100%; background: linear-gradient(90deg, var(--secondary), var(--primary)); width: 0%; transition: 0.5s ease; }
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<button class="theme-toggle" onclick="toggleMode()">
+  <svg class="icon" viewBox="0 0 24 24" style="stroke: var(--text);">
+    <path d="M9 18H15"></path><path d="M10 22H14"></path><path d="M2 10A10 10 0 1 1 22 10C22 14 18 16 16 18H8C6 16 2 14 2 10Z"></path>
+  </svg>
+</button>
+
+<div id="nicknameModal" class="modal" style="z-index: 2000;">
+  <div class="modal-content" style="text-align: center; border: 2px solid var(--primary); width: 80%; max-width: 320px;">
+    <h3 style="margin-top:0; color: var(--primary); font-weight: 800;">What's your name?</h3>
+    <p style="font-size: 13px; color: var(--sub); margin-bottom: 20px;">We'll use this for your daily greeting and in study rooms!</p>
+    <input type="text" id="nicknameInput" placeholder="Enter Nickname" style="margin-bottom: 15px; text-align: center; font-weight: bold;">
+    <button class="add-btn" style="width:100%; background: linear-gradient(90deg, var(--primary), var(--secondary));" onclick="saveNickname()">Start Studying 🚀</button>
+  </div>
+</div>
+<div id="homePage" class="page active">
+  <div style="display:flex; justify-content:space-between; align-items:center;">
+    <h2 id="greeting">Loading...</h2>
+    <button class="adjust-btn" style="font-size: 11px; padding: 4px 10px; border-color: var(--sub); color: var(--sub);" onclick="logout()">Log Out</button>
+  </div>
+
+  <div class="card" style="display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="openModal()">
+    <div class="sub">Current Time</div>
+    <div id="clock" style="font-weight: 700; font-size: 18px; color: var(--primary);"></div>
+  </div>
+
+  <div class="card" style="background: linear-gradient(135deg, rgba(236, 72, 153, 0.1), rgba(99, 102, 241, 0.1)); border: 1px solid var(--secondary);">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+        <div class="sub" style="color: var(--secondary);">Streak Challenge</div>
+        <div style="font-weight: 800; color: var(--secondary);">7-Day Goal</div>
+    </div>
+    <div class="streak-bar"><div id="streakFillHome" class="streak-fill"></div></div>
+    <div id="streakTextHome" style="font-size: 12px; font-weight: 700; text-align: center;">Day 0 of 7 Completed</div>
+  </div>
+
+  <div class="card">
+    <div class="sub">Latest Task</div>
+    <div id="latestTask" style="font-size: 18px; font-weight: 600; margin-top: 5px;">None</div>
+  </div>
+
+  <div class="card">
+    <div class="sub" style="text-align:center;">Daily Progress</div>
+    <div class="ring-box">
+      <svg width="140" height="140" viewBox="0 0 120 120">
+        <circle cx="60" cy="60" r="50" class="bg"></circle>
+        <circle cx="60" cy="60" r="50" class="progress-ring" id="ring"></circle>
+      </svg>
+      <div class="ring-text" id="progress">0%</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="sub">Upcoming Queue</div>
+    <div id="queue" style="margin-top: 10px; display: flex; flex-direction: column; gap: 5px;">
+      <div style="font-size:14px; color:var(--sub);">All caught up!</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="sub">AI Study Suggestion</div>
+    <div id="aiSuggestion" style="margin-top: 5px;">Click AI button</div>
+  </div>
+
+  <div class="card">
+    <div class="sub" id="timerLabel" style="text-align:center;">Focus Timer (30m Rule)</div>
+    <div style="display:flex; align-items:center; justify-content:center; gap:20px; margin: 20px 0;">
+      <button class="adjust-btn" onclick="adjustTime(-5)">-5m</button>
+      <div id="timer">30:00</div>
+      <button class="adjust-btn" onclick="adjustTime(5)">+5m</button>
+    </div>
+
+    <div style="display:flex; justify-content:center; gap:10px; margin-top:10px;">
+      <button class="add-btn" style="flex:1;" onclick="startTimer()">Start</button>
+      <button class="add-btn" style="flex:1;" onclick="pauseTimer()">Pause</button>
+      <button class="add-btn" style="flex:1;" onclick="resumeTimer()">Resume</button>
+      <button class="add-btn" style="flex:1; background:transparent; border:2px solid var(--primary); color:var(--primary);" onclick="resetTimer()">Reset</button>
+    </div>
+  </div>
+</div>
+
+<div id="taskPage" class="page">
+  <h2>Your Tasks</h2>
+  <div class="card">
+    <div class="input-group"><input id="taskInput" placeholder="What needs to be done?"></div>
+    <div class="time-input-container">
+      <div class="time-field"><input type="time" id="start" placeholder=" "><label for="start">Start Time</label></div>
+      <div class="time-field"><input type="time" id="end" placeholder=" "><label for="end">End Time</label></div>
+    </div>
+    <button class="add-btn" style="width:100%; margin-top:15px;" onclick="addTask()">Add Task</button>
+  </div>
+  <div class="task-toggle">
+    <div class="toggle-indicator"></div>
+    <button id="activeBtn" class="active" onclick="showActive()">Active</button>
+    <button id="completedBtn" onclick="showCompleted()">Completed</button>
+  </div>
+  <ul id="taskList" style="padding:0; list-style:none;"></ul>
+  <ul id="completedList" style="padding:0; list-style:none; display:none;"></ul>
+</div>
+
+<div id="focusPage" class="page">
+  <h2>Focus Flow</h2>
+  <div class="card" style="padding: 15px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+      <div class="sub">Deep Focus Radio</div>
+      <button class="adjust-btn" style="font-size: 12px; padding: 4px 10px; border-color: var(--secondary); color: var(--secondary);" onclick="stopMusic()">🛑 Stop</button>
+    </div>
+    <iframe id="musicWidget" style="border-radius:12px;" src="https://open.spotify.com/embed/playlist/37i9dQZF1DWZeKCadgRdKQ?utm_source=generator&theme=0" width="100%" height="152" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+  </div>
+  <div class="card">
+    <div class="sub">Session History</div>
+    <div style="margin-top: 15px; text-align: center; color: var(--primary); font-size: 32px; font-weight: 800;" id="focusTotal">0</div>
+    <div style="text-align: center; color: var(--sub); font-size: 14px;">Total Pomodoros Completed</div>
+  </div>
+</div>
+
+<div id="habitPage" class="page">
+  <h2>Habit Forge</h2>
+  <div class="card">
+    <div class="sub">Daily Habits</div>
+    <ul id="habitList" style="padding:0; list-style:none;"></ul>
+  </div>
+</div>
+
+<div id="notesPage" class="page">
+  <h2>Mind Dump</h2>
+  <div class="card">
+    <div class="sub">Quick Notes</div>
+    <textarea id="mindDumpText" placeholder="Start typing... Content automatically syncs to cloud!" style="margin-top:15px; height: 200px; resize: vertical; border: 2px dashed var(--card-border); background: transparent;"></textarea>
+    <div style="display:flex; gap:10px; margin-top:15px;">
+      <button class="add-btn" style="flex:1;" onclick="saveNotes()">Manual Save</button>
+      <button class="add-btn" style="flex:1; background:var(--secondary);" onclick="analyzeNotes()">Analyze with AI</button>
+    </div>
+  </div>
+</div>
+
+<div id="roomPage" class="page">
+  <h2>Cloud Study Rooms</h2>
+  
+  <div class="card" id="joinRoomCard">
+    <div class="sub">Room Hub</div>
+    <div style="font-size: 13px; margin: 10px 0; color: var(--sub);">Search, join, or create a live study room.</div>
+    <input type="text" id="roomCodeInput" placeholder="Search or Enter Room Code (e.g. MATH101)" style="text-transform: uppercase;">
+    <input type="hidden" id="playerNameInput" placeholder="Your Name" style="margin-top:10px;">
+    
+    <div style="display:flex; gap:10px; margin-top:15px;">
+      <button class="add-btn" onclick="joinRoom()" style="flex:1;">Join / Search</button>
+      <button class="add-btn" onclick="createRoom()" style="flex:1; background:var(--secondary);">Create New</button>
+    </div>
+  </div>
+
+  <div id="activeRoomArea" style="display:none; height: 65vh; flex-direction: column;">
+    <div class="card" style="margin-top: 0; padding: 15px; display: flex; flex-direction: column; height: 100%;">
+      
+      <div style="display:flex; justify-content:space-between; align-items:center; border-bottom: 1px solid var(--card-border); padding-bottom: 10px;">
+        <div>
+           <h3 id="roomTitle" style="margin:0; font-size: 18px;">ROOM</h3>
+           <div style="font-size: 12px; color: var(--sub);">Live Sync Active</div>
+        </div>
+        <button class="adjust-btn" style="font-size: 12px; padding: 4px 10px; border-color: var(--secondary); color: var(--secondary);" onclick="leaveRoom()">Leave</button>
+      </div>
+
+      <div class="task-toggle" style="margin-top:10px; margin-bottom: 10px;">
+        <div class="toggle-indicator" id="roomToggleInd" style="width: calc(50% - 6px); left: 6px;"></div>
+        <button id="chatTabBtn" class="active" onclick="switchRoomTab('chat')">Live Chat</button>
+        <button id="canvasTabBtn" onclick="switchRoomTab('canvas')">Shared Canvas</button>
+      </div>
+
+      <div id="roomChatContainer" style="flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:10px; padding-right: 5px;">
+      </div>
+
+      <div id="roomCanvasContainer" style="flex:1; display:none; flex-direction:column;">
+        <div style="font-size: 12px; font-weight: bold; color: var(--secondary); margin-bottom: 5px;">📝 Whiteboard: Important Points</div>
+        <textarea id="sharedCanvasArea" placeholder="Write down key formulas, deadlines, or test topics here... Everyone in the room sees this live!" style="flex:1; resize:none; border-radius: 12px; padding: 15px; border: 2px solid var(--secondary); background: rgba(255,255,255,0.2);"></textarea>
+      </div>
+
+      <div id="roomInputBox" style="display:flex; gap:10px; margin-top:10px; border-top: 1px solid var(--card-border); padding-top: 10px;">
+        <input type="text" id="roomMsgInput" placeholder="Message or @ProAssistant...">
+        <button class="add-btn" onclick="sendRoomMsg()">Send</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div id="leaderPage" class="page">
+  <h2>Quest Leaderboard</h2>
+  <div class="card" style="border: 2px solid var(--secondary); background: rgba(236, 72, 153, 0.05);">
+    <div class="sub" style="color: var(--secondary);">Weekly Streak Challenge</div>
+    <h3 style="margin: 10px 0;">Mastery Progress</h3>
+    <div class="streak-bar"><div id="streakFillLeader" class="streak-fill"></div></div>
+    <div style="display:flex; justify-content:space-between; font-size: 12px; font-weight: 800;">
+        <span id="streakDayCount">0/7 Days</span>
+        <span>Goal</span>
+    </div>
+    <button id="claimBtn" class="add-btn" style="width: 100%; margin-top: 15px; opacity: 0.5; cursor: not-allowed;" onclick="claimReward()" disabled>Claim Weekly Badge</button>
+  </div>
+  <div class="card"><div class="sub">Study Stats</div><div id="leaderStats" style="margin-top:15px; font-size: 15px; line-height:1.6;">Click below to load stats...</div><button class="add-btn" onclick="generateWeeklyRecap()" style="margin-top:15px; width:100%;">Generate Weekly Recap</button></div>
+</div>
+
+</div>
+
+<div class="nav" style="display:flex;">
+  <div class="indicator" id="navIndicator"></div>
+  <button onclick="switchPage('homePage',this)" class="active" title="Home"><svg class="icon" viewBox="0 0 24 24"><path d="M3 11L12 4L21 11"></path><path d="M5 10V20H19V10"></path></svg></button>
+  <button onclick="switchPage('taskPage',this)" title="Tasks"><svg class="icon" viewBox="0 0 24 24"><path d="M8 6H21"></path><path d="M8 12H21"></path><path d="M8 18H21"></path></svg></button>
+  <button onclick="switchPage('focusPage',this)" title="Focus"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg></button>
+  <button onclick="switchPage('roomPage',this)" title="Rooms"><svg class="icon" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg></button>
+  <button onclick="switchPage('habitPage',this)" title="Habits"><svg class="icon" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg></button>
+  <button onclick="switchPage('notesPage',this)" title="Notes"><svg class="icon" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg></button>
+  <button onclick="switchPage('leaderPage',this)" title="Leaderboard"><svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg></button>
+</div>
+
+<button class="ai-btn" style="display:flex;" onclick="toggleAI()"><svg class="icon" viewBox="0 0 24 24" style="stroke:#fff; fill:none;"><circle cx="12" cy="12" r="10"></circle><circle cx="9" cy="10" r="1"></circle><circle cx="15" cy="10" r="1"></circle><path d="M8 15C9 16 15 16 16 15"></path></svg></button>
+<div id="aiPanel" class="ai-panel">
+  <div class="ai-header">Pro Assistant<span class="close-ai" onclick="toggleAI()">×</span></div>
+  <div id="chat" class="ai-chat"><div class="msg ai">Hello! Ask me about your tasks or what to focus on today.</div></div>
+  <div style="display:flex;padding:20px; gap:10px; border-top: 1px solid var(--card-border);">
+    <input id="aiInput" placeholder="Type a message..." style="background: var(--bg-gradient);">
+    <button class="add-btn" onclick="sendAI()">Send</button>
+  </div>
+</div>
+<div id="toast" class="toast"></div>
+<div id="modal" class="modal"><div class="modal-content"><div id="dateBox" style="font-size: 16px; line-height: 1.8;"></div><br><button class="add-btn" style="width:100%;" onclick="closeModal()">Close</button></div></div>
+
+<script>
+/* =========================
+   FIREBASE CONFIG & INIT
+========================= */
+const firebaseConfig = {
+  apiKey: "AIzaSyB1Ktime-mlICWVxENVE27PtafbrXO96x4",
+  authDomain: "pro-web-app-9fe4e.firebaseapp.com",
+  projectId: "pro-web-app-9fe4e",
+  storageBucket: "pro-web-app-9fe4e.firebasestorage.app",
+  messagingSenderId: "399232879124",
+  appId: "1:399232879124:web:9fa3ca15aaf8b71ec43501"
+};
+
+let db = null;
+let userDocRef = null;
+let myUserId = null; 
+let userNickname = localStorage.getItem("proNickname") || "Pro"; 
+
+firebase.initializeApp(firebaseConfig);
+db = firebase.firestore();
+
+/* =========================
+   THE BOUNCER (PROTECT ROUTE)
+========================= */
+firebase.auth().onAuthStateChanged((user) => {
+  if (user) {
+    myUserId = user.uid; 
+    userDocRef = db.collection("users").doc(myUserId);
+    
+    loadFromCloud().then(() => {
+       if(!localStorage.getItem("proNickname")) {
+           document.getElementById("nicknameModal").style.display = "flex";
+       } else {
+           updateClockAndGreeting();
+       }
+    }); 
+  } else {
+    // If not logged in, kick back to login page!
+    window.location.href = "index.html";
+  }
+});
+
+window.logout = function() {
+  firebase.auth().signOut().then(() => {
+    localStorage.clear();
+    window.location.href = "index.html";
+  });
+};
+
+window.saveNickname = function() {
+   const nn = document.getElementById("nicknameInput").value.trim();
+   if(!nn) { alert("Please enter a nickname!"); return; }
+   
+   userNickname = nn;
+   localStorage.setItem("proNickname", nn);
+   if(userDocRef) userDocRef.set({ nickname: nn }, {merge: true});
+   
+   document.getElementById("nicknameModal").style.display = "none";
+   updateClockAndGreeting();
+   document.getElementById("playerNameInput").value = nn;
+}
+
+/* =========================
+   CLOUD SYNC ENGINE
+========================= */
+function syncToCloud() {
+  if(!userDocRef) return;
+  const notesText = document.getElementById("mindDumpText") ? document.getElementById("mindDumpText").value : "";
+  userDocRef.set({ 
+      tasks: tasks, userStats: userStats, habits: habits, notes: notesText, nickname: userNickname
+  }, {merge: true}).catch(err => console.error("Cloud Sync Error:", err));
+}
+
+async function loadFromCloud() {
+  if(!userDocRef) return;
+  try {
+    const doc = await userDocRef.get();
+    if(doc.exists) {
+      const data = doc.data();
+      if(data.tasks) tasks = data.tasks;
+      if(data.userStats) userStats = data.userStats;
+      if(data.habits) habits = data.habits;
+      if(data.notes !== undefined && document.getElementById("mindDumpText")) document.getElementById("mindDumpText").value = data.notes;
+      if(data.nickname) {
+         userNickname = data.nickname;
+         localStorage.setItem("proNickname", userNickname);
+         document.getElementById("playerNameInput").value = userNickname;
+      }
+      
+      localStorage.setItem("proTasks", JSON.stringify(tasks));
+      localStorage.setItem("proStats", JSON.stringify(userStats));
+      localStorage.setItem("proHabits", JSON.stringify(habits));
+      localStorage.setItem("proNotes", data.notes || "");
+      
+      checkDailyReset(); render(); renderHabits(); updateStreakUI(); updateClockAndGreeting();
+    }
+  } catch(err) { console.error("Error loading cloud profile:", err); }
+}
+
+/* =========================
+   GLOBAL VARIABLES & LOGIC
+========================= */
+let tasks = JSON.parse(localStorage.getItem("proTasks")) || [];
+let userStats = JSON.parse(localStorage.getItem("proStats")) || { pomodoros: 0, completedTasks: 0, streakDays: 0, lastActivityDate: null, lastResetDate: null };
+
+let habits = JSON.parse(localStorage.getItem("proHabits")) || [
+  { name: "💧 Drink 2L Water", streak: 3, lastDone: "" },
+  { name: "📖 Read 10 Pages", streak: 5, lastDone: "" },
+  { name: "🏃 Exercise 30m", streak: 0, lastDone: "" }
+];
+
+let interval = null; let running = false; let pomodoroRunning = false; let pomodoroMode = "work";
+let customWorkTime = 1800; let customBreakTime = 300; let workTime = customWorkTime; let breakTime = customBreakTime;
+
+function saveData() { localStorage.setItem("proTasks", JSON.stringify(tasks)); localStorage.setItem("proStats", JSON.stringify(userStats)); syncToCloud(); }
+
+function checkDailyReset() {
+  const today = new Date().toDateString();
+  if (userStats.lastResetDate !== today) {
+    if (userStats.lastResetDate !== null) tasks = tasks.filter(t => t.c === false);
+    userStats.lastResetDate = today; saveData();
+  }
+}
+
+function updateClockAndGreeting() {
+  const now = new Date();
+  let h = now.getHours(), m = now.getMinutes(), ampm = h >= 12 ? 'PM' : 'AM';
+  h = h % 12 || 12; m = m < 10 ? '0' + m : m;
+  document.getElementById("clock").innerText = h + ':' + m + ' ' + ampm;
+  
+  let greeting = "Good Evening, " + userNickname;
+  if (now.getHours() < 12) greeting = "Good Morning, " + userNickname;
+  else if (now.getHours() < 18) greeting = "Good Afternoon, " + userNickname;
+  document.getElementById("greeting").innerText = greeting;
+}
+setInterval(updateClockAndGreeting, 1000);
+
+function formatTime(t){ let m = Math.floor(t / 60), s = t % 60; return `${m}:${s < 10 ? "0"+s : s}`; }
+function getCurrentTime(){ return pomodoroMode === "work" ? workTime : breakTime; }
+function setCurrentTime(val){ if(pomodoroMode === "work") workTime = val; else breakTime = val; }
+
+function updateDisplay(){
+  document.getElementById("timer").innerText = formatTime(getCurrentTime());
+  document.getElementById("timerLabel").innerText = pomodoroMode === "work" ? "Focus Session (30m Rule)" : "Break Time";
+  updateButtons(); updateStreakUI();
+}
+
+window.adjustTime = function(mins) {
+  if (running) return; 
+  if (pomodoroMode === "work") { workTime += mins * 60; if (workTime < 60) workTime = 60; customWorkTime = workTime; } 
+  else { breakTime += mins * 60; if (breakTime < 60) breakTime = 60; customBreakTime = breakTime; }
+  updateDisplay();
+}
+
+function updateButtons(){
+  const startBtn = document.querySelector('button[onclick="startTimer()"]'); const stopBtn = document.querySelector('button[onclick="pauseTimer()"]'); const resumeBtn = document.querySelector('button[onclick="resumeTimer()"]');
+  if(!running && !pomodoroRunning){ startBtn.style.display="block"; stopBtn.style.display="none"; resumeBtn.style.display="none"; }
+  else if(running){ startBtn.style.display="none"; stopBtn.style.display="block"; resumeBtn.style.display="none"; }
+  else { startBtn.style.display="none"; stopBtn.style.display="none"; resumeBtn.style.display="block"; }
+}
+
+function startTimer(){
+  if(pomodoroRunning) return; running = true; pomodoroRunning = true; updateButtons();
+  interval = setInterval(() => { let current = getCurrentTime(); if(current > 0){ setCurrentTime(current - 1); updateDisplay(); } else { switchMode(); } }, 1000);
+}
+
+function pauseTimer(){ clearInterval(interval); running = false; updateButtons(); }
+function resumeTimer(){ running = true; updateButtons(); interval = setInterval(() => { let current = getCurrentTime(); if(current > 0){ setCurrentTime(current-1); updateDisplay(); } else { switchMode(); } }, 1000); }
+function resetTimer(){ clearInterval(interval); pomodoroMode = "work"; workTime = customWorkTime; breakTime = customBreakTime; running = false; pomodoroRunning = false; updateDisplay(); }
+
+function switchMode(){
+  clearInterval(interval);
+  if(pomodoroMode === "work"){ userStats.pomodoros++; checkStreakProgression(); saveData(); pomodoroMode = "break"; breakTime = customBreakTime; } 
+  else { pomodoroMode = "work"; workTime = customWorkTime; }
+  running = false; pomodoroRunning = false; updateDisplay();
+}
+
+/* =========================
+   STREAK & REWARD LOGIC
+========================= */
+function checkStreakProgression() {
+    const today = new Date().toDateString();
+    if (userStats.lastActivityDate !== today) { userStats.streakDays++; userStats.lastActivityDate = today; if (userStats.streakDays > 7) userStats.streakDays = 7; }
+}
+
+function updateStreakUI() {
+    const percent = (userStats.streakDays / 7) * 100;
+    if(document.getElementById("streakFillHome")) document.getElementById("streakFillHome").style.width = percent + "%";
+    if(document.getElementById("streakFillLeader")) document.getElementById("streakFillLeader").style.width = percent + "%";
+    if(document.getElementById("streakTextHome")) document.getElementById("streakTextHome").innerText = `Day ${userStats.streakDays} of 7 Completed`;
+    if(document.getElementById("streakDayCount")) document.getElementById("streakDayCount").innerText = `${userStats.streakDays}/7 Days`;
+    
+    const claimBtn = document.getElementById("claimBtn");
+    if (claimBtn && userStats.streakDays >= 7) { claimBtn.style.opacity = "1"; claimBtn.style.cursor = "pointer"; claimBtn.disabled = false; claimBtn.style.background = "var(--secondary)"; }
+}
+
+window.claimReward = function() { alert("Weekly Badge Claimed! Incredible focus!"); userStats.streakDays = 0; saveData(); updateStreakUI(); }
+
+/* =========================
+   TASK LOGIC
+========================= */
+window.fillSuggestion = function(text, start, end) { document.getElementById("taskInput").value = text; document.getElementById("start").value = start; document.getElementById("end").value = end; }
+
+window.addTask = function(){
+  let t = document.getElementById("taskInput").value, s = document.getElementById("start").value, e = document.getElementById("end").value;
+  if(!t || !s || !e) return; tasks.push({t,s,e,c:false}); saveData(); 
+  document.getElementById("latestTask").innerText = t; document.getElementById("taskInput").value = ""; document.getElementById("start").value = ""; document.getElementById("end").value = ""; render();
+}
+
+function render(){
+  let taskList = document.getElementById("taskList"), completedList = document.getElementById("completedList");
+  taskList.innerHTML = ""; completedList.innerHTML = ""; let done = 0, activeCount = 0;
+  
+  tasks.forEach((x,i)=>{
+    let li = document.createElement("li");
+   li.innerHTML = `<div><strong>${x.t}</strong><br><small class="time">${x.s} - ${x.e}</small></div>
+      ${!x.c ? `<button class="add-btn" style="padding: 8px 16px;" onclick="completeTask(${i})">Done</button>` : `<span class="time" style="font-weight:600; color:var(--primary);">Completed</span>`}`;
+    if(x.c){ completedList.appendChild(li); done++; } else { taskList.appendChild(li); activeCount++; }
+  });
+  
+  if (activeCount === 0) { 
+    taskList.innerHTML = `<li style="flex-direction:column; background:transparent; border:2px dashed var(--card-border); box-shadow:none;"><div style="color:var(--sub); font-size:14px; text-align:center; width:100%; margin-bottom:12px;">Your queue is empty! Start fresh:</div><div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:center; width:100%;"><button class="adjust-btn" style="font-size:12px; padding:6px 12px;" onclick="fillSuggestion('Review Notes', '09:00', '09:45')">+ Review Notes</button></div></li>`; 
+  }
+  
+  const activeTasks = tasks.filter(t => !t.c);
+  document.getElementById("latestTask").innerText = activeTasks.length > 0 ? activeTasks[activeTasks.length - 1].t : "None";
+  
+  const queueDiv = document.getElementById("queue");
+  if(queueDiv) {
+    if(activeTasks.length > 0) { queueDiv.innerHTML = activeTasks.slice(0, 3).map(t => `<div style="font-size:14px; margin-top:4px; font-weight:600;">• ${t.t}</div>`).join(''); } 
+    else { queueDiv.innerHTML = `<div style="font-size:14px; color:var(--sub); font-style:italic;">All caught up! Time to relax or add a new task.</div>`; }
+  }
+
+  let percent = tasks.length ? Math.floor((done/tasks.length)*100) : 0;
+  document.getElementById("progress").innerText = percent + "%";
+  document.getElementById("ring").style.strokeDashoffset = 314 - (percent / 100) * 314;
+  if(document.getElementById("focusTotal")) document.getElementById("focusTotal").innerText = userStats.pomodoros;
+}
+
+window.completeTask = function(i){ tasks[i].c = true; userStats.completedTasks++; saveData(); render(); }
+window.showActive = function(){ document.getElementById("taskList").style.display="block"; document.getElementById("completedList").style.display="none"; document.getElementById("activeBtn").classList.add("active"); document.getElementById("completedBtn").classList.remove("active"); document.querySelector(".toggle-indicator").style.left = "6px"; }
+window.showCompleted = function(){ document.getElementById("taskList").style.display="none"; document.getElementById("completedList").style.display="block"; document.getElementById("activeBtn").classList.remove("active"); document.getElementById("completedBtn").classList.add("active"); document.querySelector(".toggle-indicator").style.left = "calc(50% - 3px)"; }
+
+/* =========================
+   HABIT FORGE LOGIC
+========================= */
+function renderHabits() {
+  const list = document.getElementById("habitList"); if (!list) return; list.innerHTML = ""; const today = new Date().toDateString();
+  if (habits.length === 0) { list.innerHTML = `<li style="background:transparent; border:2px dashed var(--card-border); box-shadow:none; justify-content:center; color:var(--sub); font-size:14px;">No habits tracked yet!</li>`; }
+  
+  habits.forEach((h, i) => {
+    const isDoneToday = h.lastDone === today; let li = document.createElement("li");
+    li.innerHTML = `<div><strong>${h.name}</strong><br><small class="time">Streak: ${h.streak} Days</small></div>
+      <button class="add-btn" style="padding: 8px 16px; ${isDoneToday ? 'opacity:0.5; cursor:not-allowed;' : ''}" onclick="completeHabit(${i})" ${isDoneToday ? 'disabled' : ''}>${isDoneToday ? 'Done' : 'Complete'}</button>`;
+    list.appendChild(li);
+  });
+}
+
+window.completeHabit = function(i) {
+  const today = new Date().toDateString(); if (habits[i].lastDone === today) return;
+  let yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1);
+  if (habits[i].lastDone === yesterday.toDateString()) habits[i].streak++; else if (habits[i].lastDone !== today) habits[i].streak = 1;
+  habits[i].lastDone = today; localStorage.setItem("proHabits", JSON.stringify(habits)); syncToCloud(); renderHabits();
+}
+
+/* =========================
+   MIND DUMP LOGIC
+========================= */
+let notesTimeout = null;
+document.getElementById("mindDumpText").addEventListener("input", function() { localStorage.setItem("proNotes", this.value); clearTimeout(notesTimeout); notesTimeout = setTimeout(() => { syncToCloud(); }, 1500); });
+window.saveNotes = function() { const text = document.getElementById("mindDumpText").value; localStorage.setItem("proNotes", text); syncToCloud(); alert("Notes Saved to Cloud!"); }
+window.analyzeNotes = function() {
+  const text = document.getElementById("mindDumpText").value; if(!text.trim()) { alert("Write something in the Mind Dump first!"); return; }
+  const panel = document.getElementById("aiPanel"); if(panel.style.display !== "flex") toggleAI();
+  document.getElementById("aiInput").value = "Please organize these messy thoughts into a clear study plan/summary: " + text; sendAI();
+}
+window.toggleAI = function(){ const panel = document.getElementById("aiPanel"); panel.style.display = panel.style.display === "flex" ? "none" : "flex"; }
+window.sendAI = async function() {
+  const input = document.getElementById("aiInput"); const chat = document.getElementById("chat"); const userText = input.value;
+  if(!userText) return; chat.innerHTML += `<div class="msg user">${userText}</div>`; input.value = ""; chat.scrollTop = chat.scrollHeight;
+  const typingDiv = document.createElement("div"); typingDiv.className = "msg ai"; typingDiv.innerText = "..."; chat.appendChild(typingDiv);
+  setTimeout(() => { typingDiv.innerText = "I am a frontend mock of Gemini! Add a real AI API key in the code to connect me."; chat.scrollTop = chat.scrollHeight; }, 1000);
+}
+
+/* =========================
+   FIREBASE REAL-TIME CLOUD ROOMS
+========================= */
+let currentRoom = null; let unsubChat = null; let unsubCanvas = null;
+
+window.createRoom = function() {
+   const code = "ROOM-" + Math.floor(1000 + Math.random() * 9000); document.getElementById("roomCodeInput").value = code;
+   if(!document.getElementById("playerNameInput").value) { document.getElementById("playerNameInput").value = userNickname; } joinRoom();
+}
+
+window.joinRoom = function() {
+  if(!db || !myUserId) { alert("Please log in and add Firebase keys!"); return; }
+  const code = document.getElementById("roomCodeInput").value.toUpperCase().trim();
+  let name = document.getElementById("playerNameInput").value.trim(); if(!name) name = userNickname; 
+  if(!code) { alert("Please enter a room code!"); return; }
+  currentRoom = code;
+  
+  document.getElementById("joinRoomCard").style.display = "none"; document.getElementById("activeRoomArea").style.display = "flex";
+  document.getElementById("roomTitle").innerText = code; document.getElementById("roomChatContainer").innerHTML = "";
+
+  unsubChat = db.collection("rooms").doc(currentRoom).collection("messages").orderBy("createdAt").onSnapshot((snapshot) => {
+        const chatBox = document.getElementById("roomChatContainer"); chatBox.innerHTML = "";
+        snapshot.forEach((doc) => {
+            const data = doc.data(); let divClass = "friend";
+            if(data.userId === myUserId) divClass = "user"; else if(data.userId === "ai") divClass = "ai";
+            let nameLabel = data.userId === myUserId ? "" : `<strong style="font-size:11px; opacity:0.8;">${data.name}</strong><br>`;
+            chatBox.innerHTML += `<div class="msg ${divClass}">${nameLabel}${data.text}</div>`;
+        });
+        if (snapshot.empty) { chatBox.innerHTML = `<div class="msg ai" style="align-self:center; font-size: 12px; background: transparent; color: var(--sub); border: 1px dashed var(--card-border);">Room joined. Type @ProAssistant to ask AI a question!</div>`; }
+        chatBox.scrollTop = chatBox.scrollHeight;
+    });
+
+  unsubCanvas = db.collection("rooms").doc(currentRoom).onSnapshot((doc) => { if(doc.exists && !isTypingCanvas) { document.getElementById("sharedCanvasArea").value = doc.data().canvasText || ""; } });
+}
+
+window.leaveRoom = function() {
+  if(unsubChat) unsubChat(); if(unsubCanvas) unsubCanvas(); currentRoom = null;
+  document.getElementById("activeRoomArea").style.display = "none"; document.getElementById("joinRoomCard").style.display = "block"; document.getElementById("roomCodeInput").value = "";
+}
+
+window.switchRoomTab = function(tab) {
+  const chatBtn = document.getElementById("chatTabBtn"); const canvasBtn = document.getElementById("canvasTabBtn");
+  const chatArea = document.getElementById("roomChatContainer"); const canvasArea = document.getElementById("roomCanvasContainer"); const ind = document.getElementById("roomToggleInd");
+
+  if(tab === 'chat') {
+    chatArea.style.display = "flex"; canvasArea.style.display = "none";
+    chatBtn.classList.add("active"); canvasBtn.classList.remove("active"); ind.style.left = "6px"; document.getElementById("roomInputBox").style.display = "flex";
+  } else {
+    chatArea.style.display = "none"; canvasArea.style.display = "flex";
+    chatBtn.classList.remove("active"); canvasBtn.classList.add("active"); ind.style.left = "calc(50% - 3px)"; document.getElementById("roomInputBox").style.display = "none";
+  }
+}
+
+window.sendRoomMsg = function() {
+  const input = document.getElementById("roomMsgInput"); const text = input.value;
+  if(!text.trim() || !currentRoom || !db) return; input.value = "";
+  db.collection("rooms").doc(currentRoom).collection("messages").add({ text: text, userId: myUserId, name: userNickname, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+  if (text.includes("@ProAssistant")) { setTimeout(() => { db.collection("rooms").doc(currentRoom).collection("messages").add({ text: "I read that loud and clear, " + userNickname + "! Connect a real AI API to my code and I'll answer you for real.", userId: "ai", name: "@ProAssistant", createdAt: firebase.firestore.FieldValue.serverTimestamp() }); }, 1500); }
+}
+
+let canvasTimeout = null; let isTypingCanvas = false;
+document.getElementById("sharedCanvasArea").addEventListener("input", function(e) {
+    if(!currentRoom || !db) return; isTypingCanvas = true; clearTimeout(canvasTimeout); const val = e.target.value;
+    canvasTimeout = setTimeout(() => { db.collection("rooms").doc(currentRoom).set({ canvasText: val }, { merge: true }).then(() => { isTypingCanvas = false; }); }, 500); 
+});
+
+/* =========================
+   GESTURES & NAV
+========================= */
+window.stopMusic = function() { const iframe = document.getElementById("musicWidget"); if (iframe) { const currentSrc = iframe.src; iframe.src = ""; setTimeout(() => { iframe.src = currentSrc; }, 100); } }
+let touchStartX = 0, touchEndX = 0;
+document.addEventListener('touchstart', e => { if (e.target.closest('.nav') || e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.closest('.ai-panel')) return; touchStartX = e.changedTouches[0].screenX; }, {passive: true});
+document.addEventListener('touchend', e => { if (e.target.closest('.nav') || e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.closest('.ai-panel')) return; touchEndX = e.changedTouches[0].screenX; handleSwipe(); }, {passive: true});
+function handleSwipe() { const diff = touchStartX - touchEndX; if (Math.abs(diff) > 50) { if (diff > 0) navigateRelative(1); else navigateRelative(-1); } }
+const pagesOrder = ['homePage', 'taskPage', 'focusPage', 'roomPage', 'habitPage', 'notesPage', 'leaderPage'];
+function navigateRelative(dir) { const current = document.querySelector('.page.active'); let idx = pagesOrder.indexOf(current.id) + dir; if (idx >= 0 && idx < pagesOrder.length) switchPage(pagesOrder[idx], document.querySelectorAll('.nav button')[idx], dir); }
+
+function switchPage(page, btn, dir = 0){
+  document.querySelectorAll(".page").forEach(p => p.classList.remove("active", "slide-left", "slide-right"));
+  const newP = document.getElementById(page); newP.classList.add("active");
+  if (dir === 1) newP.classList.add("slide-left"); else if (dir === -1) newP.classList.add("slide-right");
+  document.querySelectorAll(".nav button").forEach(b => b.classList.remove("active")); btn.classList.add("active");
+  const ind = document.getElementById("navIndicator"); ind.style.width = btn.offsetWidth + "px"; ind.style.left = btn.offsetLeft + "px";
+  if (btn.parentNode.scrollTo) { btn.parentNode.scrollTo({ left: btn.offsetLeft - (btn.parentNode.offsetWidth / 2) + (btn.offsetWidth / 2), behavior: 'smooth' }); }
+}
+
+/* =========================
+   INITIALIZATION
+========================= */
+window.addEventListener("DOMContentLoaded",()=>{
+  const savedTheme = localStorage.getItem("proTheme");
+  if (savedTheme === "dark") { document.body.classList.add("dark"); document.querySelector(".theme-toggle svg").style.stroke = "#f8fafc"; }
+  
+  const savedNotes = localStorage.getItem("proNotes");
+  if(savedNotes && document.getElementById("mindDumpText")) document.getElementById("mindDumpText").value = savedNotes;
+
+  const activeNavBtn = document.querySelector(".nav button.active");
+  if(activeNavBtn) { const ind = document.getElementById("navIndicator"); if (ind) { ind.style.width = activeNavBtn.offsetWidth + "px"; ind.style.left = activeNavBtn.offsetLeft + "px"; } }
+
+  document.getElementById("playerNameInput").value = userNickname;
+  checkDailyReset(); updateClockAndGreeting(); updateDisplay(); updateButtons(); render(); renderHabits();
+});
+
+function toggleMode(){ const isDark = document.body.classList.toggle("dark"); localStorage.setItem("proTheme", isDark ? "dark" : "light"); document.querySelector(".theme-toggle svg").style.stroke = isDark ? "#f8fafc" : "var(--text)"; }
+function openModal(){ const now = new Date(); document.getElementById("dateBox").innerHTML = `<strong>Date:</strong> ${now.toDateString()} <br><br><strong>Year:</strong> ${now.getFullYear()}`; document.getElementById("modal").style.display = "flex"; }
+function closeModal(){ document.getElementById("modal").style.display = "none"; }
+function generateWeeklyRecap(){ document.getElementById("leaderStats").innerHTML = `<strong>Sessions:</strong> ${userStats.pomodoros} <br><strong>Tasks:</strong> ${userStats.completedTasks}`; }
+</script>
+</body>
+</html>
