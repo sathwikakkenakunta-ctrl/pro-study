@@ -40,6 +40,11 @@ body {
   transition: color 0.15s ease, background 0.15s ease; backface-visibility: hidden; -webkit-font-smoothing: antialiased;
 }
 
+/* Updated Top Bar Layout */
+.top-bar {
+  position: absolute; top: 20px; right: 20px; display: flex; align-items: center; gap: 12px; z-index: 1000;
+}
+
 @keyframes gradientShift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
 @keyframes smoothFade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes slideInRight { from { opacity: 0; transform: translateX(40px); } to { opacity: 1; transform: translateX(0); } }
@@ -48,7 +53,7 @@ body {
 .container { max-width: 420px; margin: auto; padding: 20px 16px 160px; }
 
 .theme-toggle {
-  position: absolute; top: 20px; right: 20px; width: 40px; height: 40px; border: 1px solid var(--card-border); border-radius: 50%;
+  width: 40px; height: 40px; border: 1px solid var(--card-border); border-radius: 50%;
   background: var(--card); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
   cursor: pointer; box-shadow: var(--shadow); transition: background 0.15s ease, border-color 0.15s ease, transform 0.3s ease;
   display: flex; align-items: center; justify-content: center;
@@ -68,7 +73,6 @@ body {
 }
 .card:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(0,0,0,0.15); }
 
-/* Nav styling visible by default here */
 .nav {
   position: fixed; bottom: calc(20px + env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%);
   width: 90%; max-width: 400px; padding: 8px; display: flex; gap: 5px;
@@ -165,13 +169,16 @@ h2 { margin-top: 0; font-weight: 800; letter-spacing: -0.5px;}
 
 <body>
 
-<div class="container">
+<div class="top-bar">
+  <button class="adjust-btn" style="font-size: 11px; padding: 6px 12px; border-color: var(--sub); color: var(--sub); background: var(--card); backdrop-filter: var(--glass-blur);" onclick="logout()">Log Out</button>
+  <button class="theme-toggle" onclick="toggleMode()">
+    <svg class="icon" viewBox="0 0 24 24" style="stroke: var(--text);">
+      <path d="M9 18H15"></path><path d="M10 22H14"></path><path d="M2 10A10 10 0 1 1 22 10C22 14 18 16 16 18H8C6 16 2 14 2 10Z"></path>
+    </svg>
+  </button>
+</div>
 
-<button class="theme-toggle" onclick="toggleMode()">
-  <svg class="icon" viewBox="0 0 24 24" style="stroke: var(--text);">
-    <path d="M9 18H15"></path><path d="M10 22H14"></path><path d="M2 10A10 10 0 1 1 22 10C22 14 18 16 16 18H8C6 16 2 14 2 10Z"></path>
-  </svg>
-</button>
+<div class="container">
 
 <div id="nicknameModal" class="modal" style="z-index: 2000;">
   <div class="modal-content" style="text-align: center; border: 2px solid var(--primary); width: 80%; max-width: 320px;">
@@ -181,10 +188,10 @@ h2 { margin-top: 0; font-weight: 800; letter-spacing: -0.5px;}
     <button class="add-btn" style="width:100%; background: linear-gradient(90deg, var(--primary), var(--secondary));" onclick="saveNickname()">Start Studying 🚀</button>
   </div>
 </div>
+
 <div id="homePage" class="page active">
   <div style="display:flex; justify-content:space-between; align-items:center;">
     <h2 id="greeting">Loading...</h2>
-    <button class="adjust-btn" style="font-size: 11px; padding: 4px 10px; border-color: var(--sub); color: var(--sub);" onclick="logout()">Log Out</button>
   </div>
 
   <div class="card" style="display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="openModal()">
@@ -414,20 +421,21 @@ db = firebase.firestore();
 /* =========================
    THE BOUNCER (PROTECT ROUTE)
 ========================= */
-firebase.auth().onAuthStateChanged((user) => {
+firebase.auth().onAuthStateChanged(async (user) => {
   if (user) {
     myUserId = user.uid; 
     userDocRef = db.collection("users").doc(myUserId);
     
-    loadFromCloud().then(() => {
-       if(!localStorage.getItem("proNickname")) {
-           document.getElementById("nicknameModal").style.display = "flex";
-       } else {
-           updateClockAndGreeting();
-       }
-    }); 
+    // Load from cloud first to check if nickname exists there
+    await loadFromCloud(); 
+
+    // Show modal ONLY if nickname is still the default "Pro" or missing
+    if(!userNickname || userNickname === "Pro") {
+        document.getElementById("nicknameModal").style.display = "flex";
+    } else {
+        updateClockAndGreeting();
+    }
   } else {
-    // If not logged in, kick back to login page!
     window.location.href = "index.html";
   }
 });
@@ -473,6 +481,8 @@ async function loadFromCloud() {
       if(data.userStats) userStats = data.userStats;
       if(data.habits) habits = data.habits;
       if(data.notes !== undefined && document.getElementById("mindDumpText")) document.getElementById("mindDumpText").value = data.notes;
+      
+      // Update nickname from cloud if it exists
       if(data.nickname) {
          userNickname = data.nickname;
          localStorage.setItem("proNickname", userNickname);
@@ -777,7 +787,11 @@ window.addEventListener("DOMContentLoaded",()=>{
   checkDailyReset(); updateClockAndGreeting(); updateDisplay(); updateButtons(); render(); renderHabits();
 });
 
-function toggleMode(){ const isDark = document.body.classList.toggle("dark"); localStorage.setItem("proTheme", isDark ? "dark" : "light"); document.querySelector(".theme-toggle svg").style.stroke = isDark ? "#f8fafc" : "var(--text)"; }
+function toggleMode(){ 
+  const isDark = document.body.classList.toggle("dark"); 
+  localStorage.setItem("proTheme", isDark ? "dark" : "light"); 
+  document.querySelector(".theme-toggle svg").style.stroke = isDark ? "#f8fafc" : "#1e293b"; 
+}
 function openModal(){ const now = new Date(); document.getElementById("dateBox").innerHTML = `<strong>Date:</strong> ${now.toDateString()} <br><br><strong>Year:</strong> ${now.getFullYear()}`; document.getElementById("modal").style.display = "flex"; }
 function closeModal(){ document.getElementById("modal").style.display = "none"; }
 function generateWeeklyRecap(){ document.getElementById("leaderStats").innerHTML = `<strong>Sessions:</strong> ${userStats.pomodoros} <br><strong>Tasks:</strong> ${userStats.completedTasks}`; }
