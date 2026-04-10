@@ -125,10 +125,9 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 
-// THE BOUNCER: If already logged in, skip this page and go to dashboard
 firebase.auth().onAuthStateChanged((user) => {
   if (user) {
-    window.location.href = "dashboard.html"; // Redirects to your app
+    window.location.href = "dashboard.html";
   }
 });
 
