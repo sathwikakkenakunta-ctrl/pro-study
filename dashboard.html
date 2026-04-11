@@ -678,10 +678,62 @@ window.analyzeNotes = function() {
 }
 window.toggleAI = function(){ const panel = document.getElementById("aiPanel"); panel.style.display = panel.style.display === "flex" ? "none" : "flex"; }
 window.sendAI = async function() {
-  const input = document.getElementById("aiInput"); const chat = document.getElementById("chat"); const userText = input.value;
-  if(!userText) return; chat.innerHTML += `<div class="msg user">${userText}</div>`; input.value = ""; chat.scrollTop = chat.scrollHeight;
-  const typingDiv = document.createElement("div"); typingDiv.className = "msg ai"; typingDiv.innerText = "..."; chat.appendChild(typingDiv);
-  setTimeout(() => { typingDiv.innerText = "I am a frontend mock of Gemini! Add a real AI API key in the code to connect me."; chat.scrollTop = chat.scrollHeight; }, 1000);
+  const input = document.getElementById("aiInput"); 
+  const chat = document.getElementById("chat"); 
+  const userText = input.value.trim();
+  
+  if(!userText) return; 
+  
+  // 1. Show User's Message in the UI
+  chat.innerHTML += `<div class="msg user">${userText}</div>`; 
+  input.value = ""; 
+  chat.scrollTop = chat.scrollHeight;
+  
+  // 2. Show "Thinking..." state
+  const typingDiv = document.createElement("div"); 
+  typingDiv.className = "msg ai"; 
+  typingDiv.innerText = "Thinking..."; 
+  chat.appendChild(typingDiv);
+  chat.scrollTop = chat.scrollHeight;
+
+  // 3. Use your key directly here
+  const GEMINI_API_KEY = "AIzaSyA3GHUnPSIE3giTdiSTn0DqIBxKr0p9fpI"; 
+  const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+
+  try {
+    const response = await fetch(API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        contents: [{
+          parts: [{ text: userText }]
+        }]
+      })
+    });
+
+    if (!response.ok) throw new Error("API Error");
+
+    const data = await response.json();
+    const aiText = data.candidates[0].content.parts[0].text;
+    
+    // 4. Show the AI's real answer
+    typingDiv.innerHTML = aiText.replace(/\n/g, "<br>"); 
+
+    // 5. Optional: Save to your Firestore (since Firestore is FREE)
+    if(db && myUserId) {
+      db.collection("users").doc(myUserId).collection("ai_chats").add({
+         role: "ai",
+         text: aiText,
+         createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+    }
+
+  } catch (error) {
+    console.error("AI Error:", error);
+    typingDiv.innerText = "I'm having trouble connecting to my AI brain. Check your API key!";
+  }
+  
+  chat.scrollTop = chat.scrollHeight;
 }
 
 /* =========================
