@@ -40,7 +40,7 @@ body {
   transition: color 0.15s ease, background 0.15s ease; backface-visibility: hidden; -webkit-font-smoothing: antialiased;
 }
 
-/* Updated Top Bar Layout */
+/* TOP BAR FIX */
 .top-bar {
   position: absolute; top: 20px; right: 20px; display: flex; align-items: center; gap: 12px; z-index: 1000;
 }
@@ -141,16 +141,25 @@ li:hover { background: rgba(0,0,0,0.04); transform: translateX(4px); }
 
 .ai-panel{ position:fixed;bottom:0;width:100%;height:65%; background:var(--card); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur); border-top: 1px solid var(--card-border); display:none;flex-direction:column; border-radius:30px 30px 0 0; animation:slideUp .4s cubic-bezier(0.16, 1, 0.3, 1); z-index: 500; box-shadow:0 -10px 40px rgba(0,0,0,0.15); transition: background 0.15s ease, border-color 0.15s ease;}
 @keyframes slideUp{ from{transform:translateY(100%);} to{transform:translateY(0);} }
-.ai-chat{flex:1;overflow:auto;padding:20px;display:flex;flex-direction:column;gap:12px;}
+
+/* NEW AI PANEL LAYOUT FIXES */
+.ai-header{ padding:15px 20px; display:flex; justify-content:space-between; align-items:center; font-weight:700; font-size: 16px; border-bottom: 1px solid rgba(0,0,0,0.05);}
+.dark .ai-header { border-bottom: 1px solid rgba(255,255,255,0.05); }
+.close-ai{ font-size:24px; cursor:pointer; color: var(--sub); transition:0.2s;}
+.close-ai:hover { color: var(--text); transform: scale(1.1);}
+
+.ai-chat{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:12px;}
 .msg{padding:12px 16px;border-radius:18px;max-width:80%;font-size:14px; line-height: 1.5; word-wrap: break-word;}
 .user{background:var(--secondary);color:#fff;align-self:flex-end; border-bottom-right-radius: 4px;}
 .ai{background:rgba(0,0,0,.05);align-self:flex-start; border-bottom-left-radius: 4px;}
 .friend {background: var(--primary); color:#fff; align-self:flex-start; border-bottom-left-radius: 4px;}
 .dark .ai{background:rgba(255,255,255,.1);}
-.ai-header{ padding:20px; text-align:center; font-weight:700; font-size: 18px; border-bottom: 1px solid rgba(0,0,0,0.05); position:relative;}
-.dark .ai-header { border-bottom: 1px solid rgba(255,255,255,0.05); }
-.close-ai{ position:absolute; right:20px; top:18px; font-size:24px; cursor:pointer; color: var(--sub); transition:0.2s;}
-.close-ai:hover { color: var(--text); transform: scale(1.1);}
+
+/* HISTORY LIST STYLING */
+#aiHistoryArea { flex:1; overflow-y:auto; padding:20px; display:none; }
+.history-item { cursor:pointer; padding:12px; margin-bottom:8px; background:rgba(0,0,0,0.03); border-radius:12px; transition:0.2s; font-size: 14px; font-weight: 500;}
+.dark .history-item { background:rgba(255,255,255,0.05); }
+.history-item:hover { background:var(--primary); color:#fff; transform:translateX(5px); }
 
 h2 { margin-top: 0; font-weight: 800; letter-spacing: -0.5px;}
 
@@ -183,7 +192,6 @@ h2 { margin-top: 0; font-weight: 800; letter-spacing: -0.5px;}
 <div id="nicknameModal" class="modal" style="z-index: 2000;">
   <div class="modal-content" style="text-align: center; border: 2px solid var(--primary); width: 80%; max-width: 320px;">
     <h3 style="margin-top:0; color: var(--primary); font-weight: 800;">What's your name?</h3>
-    <p style="font-size: 13px; color: var(--sub); margin-bottom: 20px;">We'll use this for your daily greeting and in study rooms!</p>
     <input type="text" id="nicknameInput" placeholder="Enter Nickname" style="margin-bottom: 15px; text-align: center; font-weight: bold;">
     <button class="add-btn" style="width:100%; background: linear-gradient(90deg, var(--primary), var(--secondary));" onclick="saveNickname()">Start Studying 🚀</button>
   </div>
@@ -328,7 +336,10 @@ h2 { margin-top: 0; font-weight: 800; letter-spacing: -0.5px;}
       
       <div style="display:flex; justify-content:space-between; align-items:center; border-bottom: 1px solid var(--card-border); padding-bottom: 10px;">
         <div>
-           <h3 id="roomTitle" style="margin:0; font-size: 18px;">ROOM</h3>
+           <div style="display:flex; align-items:center;">
+             <h3 id="roomTitle" style="margin:0; font-size: 18px;">ROOM</h3>
+             <span id="roomActiveCount" style="font-size: 12px; color: #10b981; font-weight: bold; margin-left: 10px; background: rgba(16, 185, 129, 0.1); padding: 2px 8px; border-radius: 10px;">1 Active 🟢</span>
+           </div>
            <div style="font-size: 12px; color: var(--sub);">Live Sync Active</div>
         </div>
         <button class="adjust-btn" style="font-size: 12px; padding: 4px 10px; border-color: var(--secondary); color: var(--secondary);" onclick="leaveRoom()">Leave</button>
@@ -340,16 +351,15 @@ h2 { margin-top: 0; font-weight: 800; letter-spacing: -0.5px;}
         <button id="canvasTabBtn" onclick="switchRoomTab('canvas')">Shared Canvas</button>
       </div>
 
-      <div id="roomChatContainer" style="flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:10px; padding-right: 5px;">
-      </div>
+      <div id="roomChatContainer" style="flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:10px; padding-right: 5px;"></div>
 
       <div id="roomCanvasContainer" style="flex:1; display:none; flex-direction:column;">
         <div style="font-size: 12px; font-weight: bold; color: var(--secondary); margin-bottom: 5px;">📝 Whiteboard: Important Points</div>
-        <textarea id="sharedCanvasArea" placeholder="Write down key formulas, deadlines, or test topics here... Everyone in the room sees this live!" style="flex:1; resize:none; border-radius: 12px; padding: 15px; border: 2px solid var(--secondary); background: rgba(255,255,255,0.2);"></textarea>
+        <textarea id="sharedCanvasArea" placeholder="Write down key formulas here... Everyone sees this live!" style="flex:1; resize:none; border-radius: 12px; padding: 15px; border: 2px solid var(--secondary); background: rgba(255,255,255,0.2);"></textarea>
       </div>
 
       <div id="roomInputBox" style="display:flex; gap:10px; margin-top:10px; border-top: 1px solid var(--card-border); padding-top: 10px;">
-        <input type="text" id="roomMsgInput" placeholder="Message or @ProAssistant...">
+        <input type="text" id="roomMsgInput" placeholder="Message...">
         <button class="add-btn" onclick="sendRoomMsg()">Send</button>
       </div>
 
@@ -364,8 +374,7 @@ h2 { margin-top: 0; font-weight: 800; letter-spacing: -0.5px;}
     <h3 style="margin: 10px 0;">Mastery Progress</h3>
     <div class="streak-bar"><div id="streakFillLeader" class="streak-fill"></div></div>
     <div style="display:flex; justify-content:space-between; font-size: 12px; font-weight: 800;">
-        <span id="streakDayCount">0/7 Days</span>
-        <span>Goal</span>
+        <span id="streakDayCount">0/7 Days</span><span>Goal</span>
     </div>
     <button id="claimBtn" class="add-btn" style="width: 100%; margin-top: 15px; opacity: 0.5; cursor: not-allowed;" onclick="claimReward()" disabled>Claim Weekly Badge</button>
   </div>
@@ -376,31 +385,40 @@ h2 { margin-top: 0; font-weight: 800; letter-spacing: -0.5px;}
 
 <div class="nav" style="display:flex;">
   <div class="indicator" id="navIndicator"></div>
-  <button onclick="switchPage('homePage',this)" class="active" title="Home"><svg class="icon" viewBox="0 0 24 24"><path d="M3 11L12 4L21 11"></path><path d="M5 10V20H19V10"></path></svg></button>
-  <button onclick="switchPage('taskPage',this)" title="Tasks"><svg class="icon" viewBox="0 0 24 24"><path d="M8 6H21"></path><path d="M8 12H21"></path><path d="M8 18H21"></path></svg></button>
-  <button onclick="switchPage('focusPage',this)" title="Focus"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg></button>
-  <button onclick="switchPage('roomPage',this)" title="Rooms"><svg class="icon" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg></button>
-  <button onclick="switchPage('habitPage',this)" title="Habits"><svg class="icon" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg></button>
-  <button onclick="switchPage('notesPage',this)" title="Notes"><svg class="icon" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg></button>
-  <button onclick="switchPage('leaderPage',this)" title="Leaderboard"><svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg></button>
+  <button onclick="switchPage('homePage',this)" class="active"><svg class="icon" viewBox="0 0 24 24"><path d="M3 11L12 4L21 11"></path><path d="M5 10V20H19V10"></path></svg></button>
+  <button onclick="switchPage('taskPage',this)"><svg class="icon" viewBox="0 0 24 24"><path d="M8 6H21"></path><path d="M8 12H21"></path><path d="M8 18H21"></path></svg></button>
+  <button onclick="switchPage('focusPage',this)"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg></button>
+  <button onclick="switchPage('roomPage',this)"><svg class="icon" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg></button>
+  <button onclick="switchPage('habitPage',this)"><svg class="icon" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg></button>
+  <button onclick="switchPage('notesPage',this)"><svg class="icon" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg></button>
+  <button onclick="switchPage('leaderPage',this)"><svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg></button>
 </div>
 
 <button class="ai-btn" style="display:flex;" onclick="toggleAI()"><svg class="icon" viewBox="0 0 24 24" style="stroke:#fff; fill:none;"><circle cx="12" cy="12" r="10"></circle><circle cx="9" cy="10" r="1"></circle><circle cx="15" cy="10" r="1"></circle><path d="M8 15C9 16 15 16 16 15"></path></svg></button>
+
 <div id="aiPanel" class="ai-panel">
-  <div class="ai-header">Pro Assistant<span class="close-ai" onclick="toggleAI()">×</span></div>
+  <div class="ai-header">
+    <button class="adjust-btn" style="font-size:11px; padding:4px 8px; border-color:var(--sub); color:var(--sub);" onclick="newAiChat()">+ New</button>
+    <span style="display:flex; align-items:center; gap:5px;">Pro Assistant <span class="close-ai" style="position:static;" onclick="toggleAI()">×</span></span>
+    <button class="adjust-btn" style="font-size:11px; padding:4px 8px;" onclick="toggleAiHistory()">History</button>
+  </div>
+  
+  <div id="aiHistoryArea">
+    <h4 style="margin-top:0; color:var(--primary);">Previous Chats</h4>
+    <div id="aiHistoryList"></div>
+  </div>
+
   <div id="chat" class="ai-chat"><div class="msg ai">Hello! Ask me about your tasks or what to focus on today.</div></div>
-  <div style="display:flex;padding:20px; gap:10px; border-top: 1px solid var(--card-border);">
+  
+  <div id="aiInputBox" style="display:flex;padding:20px; gap:10px; border-top: 1px solid var(--card-border);">
     <input id="aiInput" placeholder="Type a message..." style="background: var(--bg-gradient);">
     <button class="add-btn" onclick="sendAI()">Send</button>
   </div>
 </div>
-<div id="toast" class="toast"></div>
+
 <div id="modal" class="modal"><div class="modal-content"><div id="dateBox" style="font-size: 16px; line-height: 1.8;"></div><br><button class="add-btn" style="width:100%;" onclick="closeModal()">Close</button></div></div>
 
 <script>
-/* =========================
-   FIREBASE CONFIG & INIT
-========================= */
 const firebaseConfig = {
   apiKey: "AIzaSyB1Ktime-mlICWVxENVE27PtafbrXO96x4",
   authDomain: "pro-web-app-9fe4e.firebaseapp.com",
@@ -410,129 +428,71 @@ const firebaseConfig = {
   appId: "1:399232879124:web:9fa3ca15aaf8b71ec43501"
 };
 
-let db = null;
-let userDocRef = null;
-let myUserId = null; 
+let db = null; let userDocRef = null; let myUserId = null; 
 let userNickname = localStorage.getItem("proNickname") || "Pro"; 
 
 firebase.initializeApp(firebaseConfig);
 db = firebase.firestore();
 
-/* =========================
-   THE BOUNCER (PROTECT ROUTE)
-========================= */
+/* === NEW AI HISTORY VARIABLES === */
+let currentAiSession = "chat_" + Date.now();
+let aiSessionList = JSON.parse(localStorage.getItem("proAiSessions")) || [];
+
 firebase.auth().onAuthStateChanged(async (user) => {
   if (user) {
     myUserId = user.uid; 
     userDocRef = db.collection("users").doc(myUserId);
-    
-    // Load from cloud first to check if nickname exists there
     await loadFromCloud(); 
-
-    // Show modal ONLY if nickname is still the default "Pro" or missing
-    if(!userNickname || userNickname === "Pro") {
-        document.getElementById("nicknameModal").style.display = "flex";
-    } else {
-        updateClockAndGreeting();
-    }
-  } else {
-    window.location.href = "index.html";
-  }
+    if(!userNickname || userNickname === "Pro") document.getElementById("nicknameModal").style.display = "flex";
+    else updateClockAndGreeting();
+  } else { window.location.href = "index.html"; }
 });
 
-window.logout = function() {
-  firebase.auth().signOut().then(() => {
-    localStorage.clear();
-    window.location.href = "index.html";
-  });
-};
-
+window.logout = function() { firebase.auth().signOut().then(() => { localStorage.clear(); window.location.href = "index.html"; }); };
 window.saveNickname = function() {
    const nn = document.getElementById("nicknameInput").value.trim();
    if(!nn) { alert("Please enter a nickname!"); return; }
-   
-   userNickname = nn;
-   localStorage.setItem("proNickname", nn);
+   userNickname = nn; localStorage.setItem("proNickname", nn);
    if(userDocRef) userDocRef.set({ nickname: nn }, {merge: true});
-   
    document.getElementById("nicknameModal").style.display = "none";
-   updateClockAndGreeting();
-   document.getElementById("playerNameInput").value = nn;
+   updateClockAndGreeting(); document.getElementById("playerNameInput").value = nn;
 }
 
-/* =========================
-   CLOUD SYNC ENGINE
-========================= */
 function syncToCloud() {
   if(!userDocRef) return;
   const notesText = document.getElementById("mindDumpText") ? document.getElementById("mindDumpText").value : "";
-  userDocRef.set({ 
-      tasks: tasks, userStats: userStats, habits: habits, notes: notesText, nickname: userNickname
-  }, {merge: true}).catch(err => console.error("Cloud Sync Error:", err));
+  userDocRef.set({ tasks: tasks, userStats: userStats, habits: habits, notes: notesText, nickname: userNickname, aiSessions: aiSessionList }, {merge: true});
 }
 
 async function loadFromCloud() {
   if(!userDocRef) return;
-  try {
-    const doc = await userDocRef.get();
-    if(doc.exists) {
-      const data = doc.data();
-      if(data.tasks) tasks = data.tasks;
-      if(data.userStats) userStats = data.userStats;
-      if(data.habits) habits = data.habits;
-      if(data.notes !== undefined && document.getElementById("mindDumpText")) document.getElementById("mindDumpText").value = data.notes;
-      
-      // Update nickname from cloud if it exists
-      if(data.nickname) {
-         userNickname = data.nickname;
-         localStorage.setItem("proNickname", userNickname);
-         document.getElementById("playerNameInput").value = userNickname;
-      }
-      
-      localStorage.setItem("proTasks", JSON.stringify(tasks));
-      localStorage.setItem("proStats", JSON.stringify(userStats));
-      localStorage.setItem("proHabits", JSON.stringify(habits));
-      localStorage.setItem("proNotes", data.notes || "");
-      
-      checkDailyReset(); render(); renderHabits(); updateStreakUI(); updateClockAndGreeting();
-    }
-  } catch(err) { console.error("Error loading cloud profile:", err); }
+  const doc = await userDocRef.get();
+  if(doc.exists) {
+    const data = doc.data();
+    if(data.tasks) tasks = data.tasks; if(data.userStats) userStats = data.userStats; if(data.habits) habits = data.habits;
+    if(data.notes !== undefined) document.getElementById("mindDumpText").value = data.notes;
+    if(data.nickname) { userNickname = data.nickname; localStorage.setItem("proNickname", userNickname); document.getElementById("playerNameInput").value = userNickname; }
+    
+    // Load AI History 
+    if(data.aiSessions) { aiSessionList = data.aiSessions; localStorage.setItem("proAiSessions", JSON.stringify(aiSessionList)); }
+    
+    checkDailyReset(); render(); renderHabits(); updateStreakUI(); updateClockAndGreeting();
+  }
 }
 
-/* =========================
-   GLOBAL VARIABLES & LOGIC
-========================= */
 let tasks = JSON.parse(localStorage.getItem("proTasks")) || [];
 let userStats = JSON.parse(localStorage.getItem("proStats")) || { pomodoros: 0, completedTasks: 0, streakDays: 0, lastActivityDate: null, lastResetDate: null };
-
-let habits = JSON.parse(localStorage.getItem("proHabits")) || [
-  { name: "💧 Drink 2L Water", streak: 3, lastDone: "" },
-  { name: "📖 Read 10 Pages", streak: 5, lastDone: "" },
-  { name: "🏃 Exercise 30m", streak: 0, lastDone: "" }
-];
+let habits = JSON.parse(localStorage.getItem("proHabits")) || [ { name: "💧 Drink Water", streak: 3, lastDone: "" } ];
 
 let interval = null; let running = false; let pomodoroRunning = false; let pomodoroMode = "work";
 let customWorkTime = 1800; let customBreakTime = 300; let workTime = customWorkTime; let breakTime = customBreakTime;
 
 function saveData() { localStorage.setItem("proTasks", JSON.stringify(tasks)); localStorage.setItem("proStats", JSON.stringify(userStats)); syncToCloud(); }
-
-function checkDailyReset() {
-  const today = new Date().toDateString();
-  if (userStats.lastResetDate !== today) {
-    if (userStats.lastResetDate !== null) tasks = tasks.filter(t => t.c === false);
-    userStats.lastResetDate = today; saveData();
-  }
-}
-
+function checkDailyReset() { const today = new Date().toDateString(); if (userStats.lastResetDate !== today) { if (userStats.lastResetDate !== null) tasks = tasks.filter(t => t.c === false); userStats.lastResetDate = today; saveData(); } }
 function updateClockAndGreeting() {
-  const now = new Date();
-  let h = now.getHours(), m = now.getMinutes(), ampm = h >= 12 ? 'PM' : 'AM';
-  h = h % 12 || 12; m = m < 10 ? '0' + m : m;
+  const now = new Date(); let h = now.getHours(), m = now.getMinutes(), ampm = h >= 12 ? 'PM' : 'AM'; h = h % 12 || 12; m = m < 10 ? '0' + m : m;
   document.getElementById("clock").innerText = h + ':' + m + ' ' + ampm;
-  
-  let greeting = "Good Evening, " + userNickname;
-  if (now.getHours() < 12) greeting = "Good Morning, " + userNickname;
-  else if (now.getHours() < 18) greeting = "Good Afternoon, " + userNickname;
+  let greeting = "Good Evening, " + userNickname; if (now.getHours() < 12) greeting = "Good Morning, " + userNickname; else if (now.getHours() < 18) greeting = "Good Afternoon, " + userNickname;
   document.getElementById("greeting").innerText = greeting;
 }
 setInterval(updateClockAndGreeting, 1000);
@@ -540,260 +500,187 @@ setInterval(updateClockAndGreeting, 1000);
 function formatTime(t){ let m = Math.floor(t / 60), s = t % 60; return `${m}:${s < 10 ? "0"+s : s}`; }
 function getCurrentTime(){ return pomodoroMode === "work" ? workTime : breakTime; }
 function setCurrentTime(val){ if(pomodoroMode === "work") workTime = val; else breakTime = val; }
-
-function updateDisplay(){
-  document.getElementById("timer").innerText = formatTime(getCurrentTime());
-  document.getElementById("timerLabel").innerText = pomodoroMode === "work" ? "Focus Session (30m Rule)" : "Break Time";
-  updateButtons(); updateStreakUI();
-}
-
-window.adjustTime = function(mins) {
-  if (running) return; 
-  if (pomodoroMode === "work") { workTime += mins * 60; if (workTime < 60) workTime = 60; customWorkTime = workTime; } 
-  else { breakTime += mins * 60; if (breakTime < 60) breakTime = 60; customBreakTime = breakTime; }
-  updateDisplay();
-}
-
-function updateButtons(){
-  const startBtn = document.querySelector('button[onclick="startTimer()"]'); const stopBtn = document.querySelector('button[onclick="pauseTimer()"]'); const resumeBtn = document.querySelector('button[onclick="resumeTimer()"]');
-  if(!running && !pomodoroRunning){ startBtn.style.display="block"; stopBtn.style.display="none"; resumeBtn.style.display="none"; }
-  else if(running){ startBtn.style.display="none"; stopBtn.style.display="block"; resumeBtn.style.display="none"; }
-  else { startBtn.style.display="none"; stopBtn.style.display="none"; resumeBtn.style.display="block"; }
-}
-
-function startTimer(){
-  if(pomodoroRunning) return; running = true; pomodoroRunning = true; updateButtons();
-  interval = setInterval(() => { let current = getCurrentTime(); if(current > 0){ setCurrentTime(current - 1); updateDisplay(); } else { switchMode(); } }, 1000);
-}
-
+function updateDisplay(){ document.getElementById("timer").innerText = formatTime(getCurrentTime()); document.getElementById("timerLabel").innerText = pomodoroMode === "work" ? "Focus Session" : "Break Time"; updateButtons(); updateStreakUI(); }
+window.adjustTime = function(mins) { if (running) return; if (pomodoroMode === "work") { workTime += mins * 60; if (workTime < 60) workTime = 60; customWorkTime = workTime; } else { breakTime += mins * 60; if (breakTime < 60) breakTime = 60; customBreakTime = breakTime; } updateDisplay(); }
+function updateButtons(){ const startBtn = document.querySelector('button[onclick="startTimer()"]'); const stopBtn = document.querySelector('button[onclick="pauseTimer()"]'); const resumeBtn = document.querySelector('button[onclick="resumeTimer()"]'); if(!running && !pomodoroRunning){ startBtn.style.display="block"; stopBtn.style.display="none"; resumeBtn.style.display="none"; } else if(running){ startBtn.style.display="none"; stopBtn.style.display="block"; resumeBtn.style.display="none"; } else { startBtn.style.display="none"; stopBtn.style.display="none"; resumeBtn.style.display="block"; } }
+function startTimer(){ if(pomodoroRunning) return; running = true; pomodoroRunning = true; updateButtons(); interval = setInterval(() => { let current = getCurrentTime(); if(current > 0){ setCurrentTime(current - 1); updateDisplay(); } else { switchMode(); } }, 1000); }
 function pauseTimer(){ clearInterval(interval); running = false; updateButtons(); }
 function resumeTimer(){ running = true; updateButtons(); interval = setInterval(() => { let current = getCurrentTime(); if(current > 0){ setCurrentTime(current-1); updateDisplay(); } else { switchMode(); } }, 1000); }
 function resetTimer(){ clearInterval(interval); pomodoroMode = "work"; workTime = customWorkTime; breakTime = customBreakTime; running = false; pomodoroRunning = false; updateDisplay(); }
+function switchMode(){ clearInterval(interval); if(pomodoroMode === "work"){ userStats.pomodoros++; checkStreakProgression(); saveData(); pomodoroMode = "break"; breakTime = customBreakTime; } else { pomodoroMode = "work"; workTime = customWorkTime; } running = false; pomodoroRunning = false; updateDisplay(); }
 
-function switchMode(){
-  clearInterval(interval);
-  if(pomodoroMode === "work"){ userStats.pomodoros++; checkStreakProgression(); saveData(); pomodoroMode = "break"; breakTime = customBreakTime; } 
-  else { pomodoroMode = "work"; workTime = customWorkTime; }
-  running = false; pomodoroRunning = false; updateDisplay();
-}
-
-/* =========================
-   STREAK & REWARD LOGIC
-========================= */
-function checkStreakProgression() {
-    const today = new Date().toDateString();
-    if (userStats.lastActivityDate !== today) { userStats.streakDays++; userStats.lastActivityDate = today; if (userStats.streakDays > 7) userStats.streakDays = 7; }
-}
-
-function updateStreakUI() {
-    const percent = (userStats.streakDays / 7) * 100;
-    if(document.getElementById("streakFillHome")) document.getElementById("streakFillHome").style.width = percent + "%";
-    if(document.getElementById("streakFillLeader")) document.getElementById("streakFillLeader").style.width = percent + "%";
-    if(document.getElementById("streakTextHome")) document.getElementById("streakTextHome").innerText = `Day ${userStats.streakDays} of 7 Completed`;
-    if(document.getElementById("streakDayCount")) document.getElementById("streakDayCount").innerText = `${userStats.streakDays}/7 Days`;
-    
-    const claimBtn = document.getElementById("claimBtn");
-    if (claimBtn && userStats.streakDays >= 7) { claimBtn.style.opacity = "1"; claimBtn.style.cursor = "pointer"; claimBtn.disabled = false; claimBtn.style.background = "var(--secondary)"; }
-}
-
+function checkStreakProgression() { const today = new Date().toDateString(); if (userStats.lastActivityDate !== today) { userStats.streakDays++; userStats.lastActivityDate = today; if (userStats.streakDays > 7) userStats.streakDays = 7; } }
+function updateStreakUI() { const percent = (userStats.streakDays / 7) * 100; if(document.getElementById("streakFillHome")) document.getElementById("streakFillHome").style.width = percent + "%"; if(document.getElementById("streakFillLeader")) document.getElementById("streakFillLeader").style.width = percent + "%"; if(document.getElementById("streakTextHome")) document.getElementById("streakTextHome").innerText = `Day ${userStats.streakDays} of 7 Completed`; if(document.getElementById("streakDayCount")) document.getElementById("streakDayCount").innerText = `${userStats.streakDays}/7 Days`; const claimBtn = document.getElementById("claimBtn"); if (claimBtn && userStats.streakDays >= 7) { claimBtn.style.opacity = "1"; claimBtn.style.cursor = "pointer"; claimBtn.disabled = false; claimBtn.style.background = "var(--secondary)"; } }
 window.claimReward = function() { alert("Weekly Badge Claimed! Incredible focus!"); userStats.streakDays = 0; saveData(); updateStreakUI(); }
 
-/* =========================
-   TASK LOGIC
-========================= */
 window.fillSuggestion = function(text, start, end) { document.getElementById("taskInput").value = text; document.getElementById("start").value = start; document.getElementById("end").value = end; }
-
-window.addTask = function(){
-  let t = document.getElementById("taskInput").value, s = document.getElementById("start").value, e = document.getElementById("end").value;
-  if(!t || !s || !e) return; tasks.push({t,s,e,c:false}); saveData(); 
-  document.getElementById("latestTask").innerText = t; document.getElementById("taskInput").value = ""; document.getElementById("start").value = ""; document.getElementById("end").value = ""; render();
-}
-
-function render(){
-  let taskList = document.getElementById("taskList"), completedList = document.getElementById("completedList");
-  taskList.innerHTML = ""; completedList.innerHTML = ""; let done = 0, activeCount = 0;
-  
-  tasks.forEach((x,i)=>{
-    let li = document.createElement("li");
-   li.innerHTML = `<div><strong>${x.t}</strong><br><small class="time">${x.s} - ${x.e}</small></div>
-      ${!x.c ? `<button class="add-btn" style="padding: 8px 16px;" onclick="completeTask(${i})">Done</button>` : `<span class="time" style="font-weight:600; color:var(--primary);">Completed</span>`}`;
-    if(x.c){ completedList.appendChild(li); done++; } else { taskList.appendChild(li); activeCount++; }
-  });
-  
-  if (activeCount === 0) { 
-    taskList.innerHTML = `<li style="flex-direction:column; background:transparent; border:2px dashed var(--card-border); box-shadow:none;"><div style="color:var(--sub); font-size:14px; text-align:center; width:100%; margin-bottom:12px;">Your queue is empty! Start fresh:</div><div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:center; width:100%;"><button class="adjust-btn" style="font-size:12px; padding:6px 12px;" onclick="fillSuggestion('Review Notes', '09:00', '09:45')">+ Review Notes</button></div></li>`; 
-  }
-  
-  const activeTasks = tasks.filter(t => !t.c);
-  document.getElementById("latestTask").innerText = activeTasks.length > 0 ? activeTasks[activeTasks.length - 1].t : "None";
-  
-  const queueDiv = document.getElementById("queue");
-  if(queueDiv) {
-    if(activeTasks.length > 0) { queueDiv.innerHTML = activeTasks.slice(0, 3).map(t => `<div style="font-size:14px; margin-top:4px; font-weight:600;">• ${t.t}</div>`).join(''); } 
-    else { queueDiv.innerHTML = `<div style="font-size:14px; color:var(--sub); font-style:italic;">All caught up! Time to relax or add a new task.</div>`; }
-  }
-
-  let percent = tasks.length ? Math.floor((done/tasks.length)*100) : 0;
-  document.getElementById("progress").innerText = percent + "%";
-  document.getElementById("ring").style.strokeDashoffset = 314 - (percent / 100) * 314;
-  if(document.getElementById("focusTotal")) document.getElementById("focusTotal").innerText = userStats.pomodoros;
-}
-
+window.addTask = function(){ let t = document.getElementById("taskInput").value, s = document.getElementById("start").value, e = document.getElementById("end").value; if(!t || !s || !e) return; tasks.push({t,s,e,c:false}); saveData(); document.getElementById("latestTask").innerText = t; document.getElementById("taskInput").value = ""; document.getElementById("start").value = ""; document.getElementById("end").value = ""; render(); }
+function render(){ let taskList = document.getElementById("taskList"), completedList = document.getElementById("completedList"); taskList.innerHTML = ""; completedList.innerHTML = ""; let done = 0, activeCount = 0; tasks.forEach((x,i)=>{ let li = document.createElement("li"); li.innerHTML = `<div><strong>${x.t}</strong><br><small class="time">${x.s} - ${x.e}</small></div> ${!x.c ? `<button class="add-btn" style="padding: 8px 16px;" onclick="completeTask(${i})">Done</button>` : `<span class="time" style="font-weight:600; color:var(--primary);">Completed</span>`}`; if(x.c){ completedList.appendChild(li); done++; } else { taskList.appendChild(li); activeCount++; } }); if (activeCount === 0) { taskList.innerHTML = `<li style="flex-direction:column; background:transparent; border:2px dashed var(--card-border); box-shadow:none;"><div style="color:var(--sub); font-size:14px; text-align:center; width:100%; margin-bottom:12px;">Your queue is empty! Start fresh:</div><div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:center; width:100%;"><button class="adjust-btn" style="font-size:12px; padding:6px 12px;" onclick="fillSuggestion('Review Notes', '09:00', '09:45')">+ Review Notes</button></div></li>`; } const activeTasks = tasks.filter(t => !t.c); document.getElementById("latestTask").innerText = activeTasks.length > 0 ? activeTasks[activeTasks.length - 1].t : "None"; const queueDiv = document.getElementById("queue"); if(queueDiv) { if(activeTasks.length > 0) { queueDiv.innerHTML = activeTasks.slice(0, 3).map(t => `<div style="font-size:14px; margin-top:4px; font-weight:600;">• ${t.t}</div>`).join(''); } else { queueDiv.innerHTML = `<div style="font-size:14px; color:var(--sub); font-style:italic;">All caught up!</div>`; } } let percent = tasks.length ? Math.floor((done/tasks.length)*100) : 0; document.getElementById("progress").innerText = percent + "%"; document.getElementById("ring").style.strokeDashoffset = 314 - (percent / 100) * 314; if(document.getElementById("focusTotal")) document.getElementById("focusTotal").innerText = userStats.pomodoros; }
 window.completeTask = function(i){ tasks[i].c = true; userStats.completedTasks++; saveData(); render(); }
 window.showActive = function(){ document.getElementById("taskList").style.display="block"; document.getElementById("completedList").style.display="none"; document.getElementById("activeBtn").classList.add("active"); document.getElementById("completedBtn").classList.remove("active"); document.querySelector(".toggle-indicator").style.left = "6px"; }
 window.showCompleted = function(){ document.getElementById("taskList").style.display="none"; document.getElementById("completedList").style.display="block"; document.getElementById("activeBtn").classList.remove("active"); document.getElementById("completedBtn").classList.add("active"); document.querySelector(".toggle-indicator").style.left = "calc(50% - 3px)"; }
 
-/* =========================
-   HABIT FORGE LOGIC
-========================= */
-function renderHabits() {
-  const list = document.getElementById("habitList"); if (!list) return; list.innerHTML = ""; const today = new Date().toDateString();
-  if (habits.length === 0) { list.innerHTML = `<li style="background:transparent; border:2px dashed var(--card-border); box-shadow:none; justify-content:center; color:var(--sub); font-size:14px;">No habits tracked yet!</li>`; }
-  
-  habits.forEach((h, i) => {
-    const isDoneToday = h.lastDone === today; let li = document.createElement("li");
-    li.innerHTML = `<div><strong>${h.name}</strong><br><small class="time">Streak: ${h.streak} Days</small></div>
-      <button class="add-btn" style="padding: 8px 16px; ${isDoneToday ? 'opacity:0.5; cursor:not-allowed;' : ''}" onclick="completeHabit(${i})" ${isDoneToday ? 'disabled' : ''}>${isDoneToday ? 'Done' : 'Complete'}</button>`;
-    list.appendChild(li);
-  });
-}
+function renderHabits() { const list = document.getElementById("habitList"); if (!list) return; list.innerHTML = ""; const today = new Date().toDateString(); if (habits.length === 0) { list.innerHTML = `<li style="background:transparent; border:2px dashed var(--card-border); box-shadow:none; justify-content:center; color:var(--sub); font-size:14px;">No habits tracked yet!</li>`; } habits.forEach((h, i) => { const isDoneToday = h.lastDone === today; let li = document.createElement("li"); li.innerHTML = `<div><strong>${h.name}</strong><br><small class="time">Streak: ${h.streak} Days</small></div> <button class="add-btn" style="padding: 8px 16px; ${isDoneToday ? 'opacity:0.5; cursor:not-allowed;' : ''}" onclick="completeHabit(${i})" ${isDoneToday ? 'disabled' : ''}>${isDoneToday ? 'Done' : 'Complete'}</button>`; list.appendChild(li); }); }
+window.completeHabit = function(i) { const today = new Date().toDateString(); if (habits[i].lastDone === today) return; let yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1); if (habits[i].lastDone === yesterday.toDateString()) habits[i].streak++; else if (habits[i].lastDone !== today) habits[i].streak = 1; habits[i].lastDone = today; localStorage.setItem("proHabits", JSON.stringify(habits)); syncToCloud(); renderHabits(); }
 
-window.completeHabit = function(i) {
-  const today = new Date().toDateString(); if (habits[i].lastDone === today) return;
-  let yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1);
-  if (habits[i].lastDone === yesterday.toDateString()) habits[i].streak++; else if (habits[i].lastDone !== today) habits[i].streak = 1;
-  habits[i].lastDone = today; localStorage.setItem("proHabits", JSON.stringify(habits)); syncToCloud(); renderHabits();
-}
-
-/* =========================
-   MIND DUMP LOGIC
-========================= */
-let notesTimeout = null;
-document.getElementById("mindDumpText").addEventListener("input", function() { localStorage.setItem("proNotes", this.value); clearTimeout(notesTimeout); notesTimeout = setTimeout(() => { syncToCloud(); }, 1500); });
+let notesTimeout = null; document.getElementById("mindDumpText").addEventListener("input", function() { localStorage.setItem("proNotes", this.value); clearTimeout(notesTimeout); notesTimeout = setTimeout(() => { syncToCloud(); }, 1500); });
 window.saveNotes = function() { const text = document.getElementById("mindDumpText").value; localStorage.setItem("proNotes", text); syncToCloud(); alert("Notes Saved to Cloud!"); }
-window.analyzeNotes = function() {
-  const text = document.getElementById("mindDumpText").value; if(!text.trim()) { alert("Write something in the Mind Dump first!"); return; }
-  const panel = document.getElementById("aiPanel"); if(panel.style.display !== "flex") toggleAI();
-  document.getElementById("aiInput").value = "Please organize these messy thoughts into a clear study plan/summary: " + text; sendAI();
-}
+window.analyzeNotes = function() { const text = document.getElementById("mindDumpText").value; if(!text.trim()) { alert("Write something in the Mind Dump first!"); return; } const panel = document.getElementById("aiPanel"); if(panel.style.display !== "flex") toggleAI(); document.getElementById("aiInput").value = "Please organize these messy thoughts into a clear study plan: " + text; sendAI(); }
 window.toggleAI = function(){ const panel = document.getElementById("aiPanel"); panel.style.display = panel.style.display === "flex" ? "none" : "flex"; }
+
+/* =======================================
+   UPGRADED: GEMINI AI WITH CHAT HISTORY 
+======================================= */
+window.newAiChat = function() {
+    currentAiSession = "chat_" + Date.now();
+    document.getElementById("chat").innerHTML = `<div class="msg ai">New chat started! How can I help you today?</div>`;
+    document.getElementById("aiHistoryArea").style.display = "none";
+    document.getElementById("chat").style.display = "flex";
+    document.getElementById("aiInputBox").style.display = "flex";
+}
+
+window.toggleAiHistory = function() {
+    const histArea = document.getElementById("aiHistoryArea");
+    const chatArea = document.getElementById("chat");
+    const inputBox = document.getElementById("aiInputBox");
+    
+    if(histArea.style.display === "none") {
+        histArea.style.display = "block"; chatArea.style.display = "none"; inputBox.style.display = "none";
+        
+        // Render the list of past sessions
+        const list = document.getElementById("aiHistoryList"); list.innerHTML = "";
+        if(aiSessionList.length === 0) list.innerHTML = "<div style='font-size:13px; color:var(--sub);'>No history saved yet.</div>";
+        [...aiSessionList].reverse().forEach(sess => {
+            list.innerHTML += `<div class="history-item" onclick="loadPastChat('${sess.id}')">💬 ${sess.title}</div>`;
+        });
+    } else {
+        histArea.style.display = "none"; chatArea.style.display = "flex"; inputBox.style.display = "flex";
+    }
+}
+
+window.loadPastChat = async function(sessionId) {
+    currentAiSession = sessionId;
+    document.getElementById("aiHistoryArea").style.display = "none";
+    const chatDiv = document.getElementById("chat");
+    chatDiv.style.display = "flex"; document.getElementById("aiInputBox").style.display = "flex";
+    chatDiv.innerHTML = `<div class="msg ai">Loading cloud memory...</div>`;
+
+    if(db && myUserId) {
+        const snapshot = await db.collection("users").doc(myUserId).collection("ai_chats").where("sessionId", "==", sessionId).orderBy("createdAt").get();
+        chatDiv.innerHTML = "";
+        if(snapshot.empty) chatDiv.innerHTML = `<div class="msg ai">I couldn't find any memory for this chat.</div>`;
+        snapshot.forEach(doc => {
+            const data = doc.data(); const divClass = data.role === "user" ? "user" : "ai";
+            chatDiv.innerHTML += `<div class="msg ${divClass}">${data.text.replace(/\n/g, "<br>")}</div>`;
+        });
+        chatDiv.scrollTop = chatDiv.scrollHeight;
+    }
+}
+
 window.sendAI = async function() {
-  const input = document.getElementById("aiInput"); 
-  const chat = document.getElementById("chat"); 
-  const userText = input.value.trim();
-  
+  const input = document.getElementById("aiInput"); const chat = document.getElementById("chat"); const userText = input.value.trim();
   if(!userText) return; 
   
-  // 1. Show User's Message in the UI
-  chat.innerHTML += `<div class="msg user">${userText}</div>`; 
-  input.value = ""; 
-  chat.scrollTop = chat.scrollHeight;
-  
-  // 2. Show "Thinking..." state
-  const typingDiv = document.createElement("div"); 
-  typingDiv.className = "msg ai"; 
-  typingDiv.innerText = "Thinking..."; 
-  chat.appendChild(typingDiv);
-  chat.scrollTop = chat.scrollHeight;
+  chat.innerHTML += `<div class="msg user">${userText}</div>`; input.value = ""; chat.scrollTop = chat.scrollHeight;
+  const typingDiv = document.createElement("div"); typingDiv.className = "msg ai"; typingDiv.innerText = "Thinking..."; chat.appendChild(typingDiv); chat.scrollTop = chat.scrollHeight;
 
-  // 3. Use your key directly here
-  const GEMINI_API_KEY = "AIzaSyA3GHUnPSIE3giTdiSTn0DqIBxKr0p9fpI"; 
-  const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+  // Session Management: Save the title if it's the first message of this session
+  if(!aiSessionList.find(s => s.id === currentAiSession)) {
+      aiSessionList.push({ id: currentAiSession, title: userText.substring(0, 25) + "..." });
+      syncToCloud(); // Save session list to Firebase
+  }
+
+  // Save USER message to History
+  if(db && myUserId) { db.collection("users").doc(myUserId).collection("ai_chats").add({ sessionId: currentAiSession, role: "user", text: userText, createdAt: firebase.firestore.FieldValue.serverTimestamp() }); }
+
+  const GEMINI_API_KEY = "YOUR_API_KEY_HERE"; 
+  const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
 
   try {
-    const response = await fetch(API_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        contents: [{
-          parts: [{ text: userText }]
-        }]
-      })
-    });
-
+    const response = await fetch(API_URL, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ contents: [{ parts: [{ text: userText }] }] }) });
     if (!response.ok) throw new Error("API Error");
-
-    const data = await response.json();
-    const aiText = data.candidates[0].content.parts[0].text;
-    
-    // 4. Show the AI's real answer
+    const data = await response.json(); const aiText = data.candidates[0].content.parts[0].text;
     typingDiv.innerHTML = aiText.replace(/\n/g, "<br>"); 
 
-    // 5. Optional: Save to your Firestore (since Firestore is FREE)
-    if(db && myUserId) {
-      db.collection("users").doc(myUserId).collection("ai_chats").add({
-         role: "ai",
-         text: aiText,
-         createdAt: firebase.firestore.FieldValue.serverTimestamp()
-      });
-    }
-
-  } catch (error) {
-    console.error("AI Error:", error);
-    typingDiv.innerText = "I'm having trouble connecting to my AI brain. Check your API key!";
-  }
-  
+    // Save AI response to History
+    if(db && myUserId) { db.collection("users").doc(myUserId).collection("ai_chats").add({ sessionId: currentAiSession, role: "ai", text: aiText, createdAt: firebase.firestore.FieldValue.serverTimestamp() }); }
+  } catch (error) { console.error(error); typingDiv.innerText = "Error connecting to AI. Did you add your API key?"; }
   chat.scrollTop = chat.scrollHeight;
 }
 
-/* =========================
-   FIREBASE REAL-TIME CLOUD ROOMS
-========================= */
-let currentRoom = null; let unsubChat = null; let unsubCanvas = null;
+/* =======================================
+   UPGRADED: LIVE CLOUD ROOMS WITH ACTIVE USERS
+======================================= */
+let currentRoom = null; let unsubRoomDetails = null; let unsubChat = null;
 
-window.createRoom = function() {
-   const code = "ROOM-" + Math.floor(1000 + Math.random() * 9000); document.getElementById("roomCodeInput").value = code;
-   if(!document.getElementById("playerNameInput").value) { document.getElementById("playerNameInput").value = userNickname; } joinRoom();
-}
+window.createRoom = function() { const code = "ROOM-" + Math.floor(1000 + Math.random() * 9000); document.getElementById("roomCodeInput").value = code; if(!document.getElementById("playerNameInput").value) { document.getElementById("playerNameInput").value = userNickname; } joinRoom(); }
 
 window.joinRoom = function() {
   if(!db || !myUserId) { alert("Please log in and add Firebase keys!"); return; }
   const code = document.getElementById("roomCodeInput").value.toUpperCase().trim();
-  let name = document.getElementById("playerNameInput").value.trim(); if(!name) name = userNickname; 
-  if(!code) { alert("Please enter a room code!"); return; }
-  currentRoom = code;
+  if(!code) return; currentRoom = code;
   
   document.getElementById("joinRoomCard").style.display = "none"; document.getElementById("activeRoomArea").style.display = "flex";
   document.getElementById("roomTitle").innerText = code; document.getElementById("roomChatContainer").innerHTML = "";
 
+  // 1. ADD USER TO ACTIVE LIST
+  db.collection("rooms").doc(currentRoom).set({
+      activeUsers: firebase.firestore.FieldValue.arrayUnion(myUserId)
+  }, { merge: true });
+
+  // 2. LISTEN TO CHAT MESSAGES
   unsubChat = db.collection("rooms").doc(currentRoom).collection("messages").orderBy("createdAt").onSnapshot((snapshot) => {
         const chatBox = document.getElementById("roomChatContainer"); chatBox.innerHTML = "";
         snapshot.forEach((doc) => {
-            const data = doc.data(); let divClass = "friend";
-            if(data.userId === myUserId) divClass = "user"; else if(data.userId === "ai") divClass = "ai";
+            const data = doc.data(); let divClass = data.userId === myUserId ? "user" : "friend";
             let nameLabel = data.userId === myUserId ? "" : `<strong style="font-size:11px; opacity:0.8;">${data.name}</strong><br>`;
             chatBox.innerHTML += `<div class="msg ${divClass}">${nameLabel}${data.text}</div>`;
         });
-        if (snapshot.empty) { chatBox.innerHTML = `<div class="msg ai" style="align-self:center; font-size: 12px; background: transparent; color: var(--sub); border: 1px dashed var(--card-border);">Room joined. Type @ProAssistant to ask AI a question!</div>`; }
+        if (snapshot.empty) chatBox.innerHTML = `<div class="msg ai" style="align-self:center; background:transparent; color:var(--sub);">Room joined. Say hello!</div>`;
         chatBox.scrollTop = chatBox.scrollHeight;
     });
 
-  unsubCanvas = db.collection("rooms").doc(currentRoom).onSnapshot((doc) => { if(doc.exists && !isTypingCanvas) { document.getElementById("sharedCanvasArea").value = doc.data().canvasText || ""; } });
+  // 3. LISTEN TO ROOM DATA (Canvas + Active User Count)
+  unsubRoomDetails = db.collection("rooms").doc(currentRoom).onSnapshot((doc) => { 
+      if(doc.exists) {
+          const data = doc.data();
+          
+          // Update the "🟢 X Active" Badge
+          const count = data.activeUsers ? data.activeUsers.length : 0;
+          document.getElementById("roomActiveCount").innerText = `${count} Active 🟢`;
+
+          // Sync Canvas
+          if(!isTypingCanvas) document.getElementById("sharedCanvasArea").value = data.canvasText || ""; 
+      } 
+  });
 }
 
 window.leaveRoom = function() {
-  if(unsubChat) unsubChat(); if(unsubCanvas) unsubCanvas(); currentRoom = null;
+  if(!currentRoom) return;
+  // Remove user from active array
+  db.collection("rooms").doc(currentRoom).update({ activeUsers: firebase.firestore.FieldValue.arrayRemove(myUserId) });
+  
+  if(unsubChat) unsubChat(); if(unsubRoomDetails) unsubRoomDetails(); currentRoom = null;
   document.getElementById("activeRoomArea").style.display = "none"; document.getElementById("joinRoomCard").style.display = "block"; document.getElementById("roomCodeInput").value = "";
 }
+
+// Ensure they are removed from the room if they literally close the browser tab
+window.addEventListener("beforeunload", () => {
+    if(currentRoom && db && myUserId) {
+        db.collection("rooms").doc(currentRoom).update({ activeUsers: firebase.firestore.FieldValue.arrayRemove(myUserId) });
+    }
+});
 
 window.switchRoomTab = function(tab) {
   const chatBtn = document.getElementById("chatTabBtn"); const canvasBtn = document.getElementById("canvasTabBtn");
   const chatArea = document.getElementById("roomChatContainer"); const canvasArea = document.getElementById("roomCanvasContainer"); const ind = document.getElementById("roomToggleInd");
-
-  if(tab === 'chat') {
-    chatArea.style.display = "flex"; canvasArea.style.display = "none";
-    chatBtn.classList.add("active"); canvasBtn.classList.remove("active"); ind.style.left = "6px"; document.getElementById("roomInputBox").style.display = "flex";
-  } else {
-    chatArea.style.display = "none"; canvasArea.style.display = "flex";
-    chatBtn.classList.remove("active"); canvasBtn.classList.add("active"); ind.style.left = "calc(50% - 3px)"; document.getElementById("roomInputBox").style.display = "none";
-  }
+  if(tab === 'chat') { chatArea.style.display = "flex"; canvasArea.style.display = "none"; chatBtn.classList.add("active"); canvasBtn.classList.remove("active"); ind.style.left = "6px"; document.getElementById("roomInputBox").style.display = "flex";
+  } else { chatArea.style.display = "none"; canvasArea.style.display = "flex"; chatBtn.classList.remove("active"); canvasBtn.classList.add("active"); ind.style.left = "calc(50% - 3px)"; document.getElementById("roomInputBox").style.display = "none"; }
 }
 
 window.sendRoomMsg = function() {
-  const input = document.getElementById("roomMsgInput"); const text = input.value;
-  if(!text.trim() || !currentRoom || !db) return; input.value = "";
+  const input = document.getElementById("roomMsgInput"); const text = input.value; if(!text.trim() || !currentRoom || !db) return; input.value = "";
   db.collection("rooms").doc(currentRoom).collection("messages").add({ text: text, userId: myUserId, name: userNickname, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
-  if (text.includes("@ProAssistant")) { setTimeout(() => { db.collection("rooms").doc(currentRoom).collection("messages").add({ text: "I read that loud and clear, " + userNickname + "! Connect a real AI API to my code and I'll answer you for real.", userId: "ai", name: "@ProAssistant", createdAt: firebase.firestore.FieldValue.serverTimestamp() }); }, 1500); }
 }
 
 let canvasTimeout = null; let isTypingCanvas = false;
@@ -806,44 +693,21 @@ document.getElementById("sharedCanvasArea").addEventListener("input", function(e
    GESTURES & NAV
 ========================= */
 window.stopMusic = function() { const iframe = document.getElementById("musicWidget"); if (iframe) { const currentSrc = iframe.src; iframe.src = ""; setTimeout(() => { iframe.src = currentSrc; }, 100); } }
-let touchStartX = 0, touchEndX = 0;
-document.addEventListener('touchstart', e => { if (e.target.closest('.nav') || e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.closest('.ai-panel')) return; touchStartX = e.changedTouches[0].screenX; }, {passive: true});
+let touchStartX = 0, touchEndX = 0; document.addEventListener('touchstart', e => { if (e.target.closest('.nav') || e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.closest('.ai-panel')) return; touchStartX = e.changedTouches[0].screenX; }, {passive: true});
 document.addEventListener('touchend', e => { if (e.target.closest('.nav') || e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.closest('.ai-panel')) return; touchEndX = e.changedTouches[0].screenX; handleSwipe(); }, {passive: true});
 function handleSwipe() { const diff = touchStartX - touchEndX; if (Math.abs(diff) > 50) { if (diff > 0) navigateRelative(1); else navigateRelative(-1); } }
 const pagesOrder = ['homePage', 'taskPage', 'focusPage', 'roomPage', 'habitPage', 'notesPage', 'leaderPage'];
 function navigateRelative(dir) { const current = document.querySelector('.page.active'); let idx = pagesOrder.indexOf(current.id) + dir; if (idx >= 0 && idx < pagesOrder.length) switchPage(pagesOrder[idx], document.querySelectorAll('.nav button')[idx], dir); }
+function switchPage(page, btn, dir = 0){ document.querySelectorAll(".page").forEach(p => p.classList.remove("active", "slide-left", "slide-right")); const newP = document.getElementById(page); newP.classList.add("active"); if (dir === 1) newP.classList.add("slide-left"); else if (dir === -1) newP.classList.add("slide-right"); document.querySelectorAll(".nav button").forEach(b => b.classList.remove("active")); btn.classList.add("active"); const ind = document.getElementById("navIndicator"); ind.style.width = btn.offsetWidth + "px"; ind.style.left = btn.offsetLeft + "px"; if (btn.parentNode.scrollTo) { btn.parentNode.scrollTo({ left: btn.offsetLeft - (btn.parentNode.offsetWidth / 2) + (btn.offsetWidth / 2), behavior: 'smooth' }); } }
 
-function switchPage(page, btn, dir = 0){
-  document.querySelectorAll(".page").forEach(p => p.classList.remove("active", "slide-left", "slide-right"));
-  const newP = document.getElementById(page); newP.classList.add("active");
-  if (dir === 1) newP.classList.add("slide-left"); else if (dir === -1) newP.classList.add("slide-right");
-  document.querySelectorAll(".nav button").forEach(b => b.classList.remove("active")); btn.classList.add("active");
-  const ind = document.getElementById("navIndicator"); ind.style.width = btn.offsetWidth + "px"; ind.style.left = btn.offsetLeft + "px";
-  if (btn.parentNode.scrollTo) { btn.parentNode.scrollTo({ left: btn.offsetLeft - (btn.parentNode.offsetWidth / 2) + (btn.offsetWidth / 2), behavior: 'smooth' }); }
-}
-
-/* =========================
-   INITIALIZATION
-========================= */
 window.addEventListener("DOMContentLoaded",()=>{
-  const savedTheme = localStorage.getItem("proTheme");
-  if (savedTheme === "dark") { document.body.classList.add("dark"); document.querySelector(".theme-toggle svg").style.stroke = "#f8fafc"; }
-  
-  const savedNotes = localStorage.getItem("proNotes");
-  if(savedNotes && document.getElementById("mindDumpText")) document.getElementById("mindDumpText").value = savedNotes;
-
-  const activeNavBtn = document.querySelector(".nav button.active");
-  if(activeNavBtn) { const ind = document.getElementById("navIndicator"); if (ind) { ind.style.width = activeNavBtn.offsetWidth + "px"; ind.style.left = activeNavBtn.offsetLeft + "px"; } }
-
-  document.getElementById("playerNameInput").value = userNickname;
-  checkDailyReset(); updateClockAndGreeting(); updateDisplay(); updateButtons(); render(); renderHabits();
+  const savedTheme = localStorage.getItem("proTheme"); if (savedTheme === "dark") { document.body.classList.add("dark"); document.querySelector(".theme-toggle svg").style.stroke = "#f8fafc"; }
+  const savedNotes = localStorage.getItem("proNotes"); if(savedNotes && document.getElementById("mindDumpText")) document.getElementById("mindDumpText").value = savedNotes;
+  const activeNavBtn = document.querySelector(".nav button.active"); if(activeNavBtn) { const ind = document.getElementById("navIndicator"); if (ind) { ind.style.width = activeNavBtn.offsetWidth + "px"; ind.style.left = activeNavBtn.offsetLeft + "px"; } }
+  document.getElementById("playerNameInput").value = userNickname; checkDailyReset(); updateClockAndGreeting(); updateDisplay(); updateButtons(); render(); renderHabits();
 });
 
-function toggleMode(){ 
-  const isDark = document.body.classList.toggle("dark"); 
-  localStorage.setItem("proTheme", isDark ? "dark" : "light"); 
-  document.querySelector(".theme-toggle svg").style.stroke = isDark ? "#f8fafc" : "#1e293b"; 
-}
+function toggleMode(){ const isDark = document.body.classList.toggle("dark"); localStorage.setItem("proTheme", isDark ? "dark" : "light"); document.querySelector(".theme-toggle svg").style.stroke = isDark ? "#f8fafc" : "#1e293b"; }
 function openModal(){ const now = new Date(); document.getElementById("dateBox").innerHTML = `<strong>Date:</strong> ${now.toDateString()} <br><br><strong>Year:</strong> ${now.getFullYear()}`; document.getElementById("modal").style.display = "flex"; }
 function closeModal(){ document.getElementById("modal").style.display = "none"; }
 function generateWeeklyRecap(){ document.getElementById("leaderStats").innerHTML = `<strong>Sessions:</strong> ${userStats.pomodoros} <br><strong>Tasks:</strong> ${userStats.completedTasks}`; }
