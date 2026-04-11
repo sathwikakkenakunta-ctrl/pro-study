@@ -125,9 +125,17 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 
+// THE BOUNCER: Check if logged in AND verified
 firebase.auth().onAuthStateChanged((user) => {
   if (user) {
-    window.location.href = "dashboard.html";
+    if (user.emailVerified) {
+      // Verified? Let them in.
+      window.location.href = "dashboard.html";
+    } else {
+      // Not verified? Kick them out.
+      firebase.auth().signOut();
+      alert("Hold up! You need to verify your email first. Check your inbox (and spam folder) for the verification link.");
+    }
   }
 });
 
@@ -202,15 +210,38 @@ window.forgotPassword = function() {
 };
 
 window.signup = function() {
-  const email = document.getElementById("emailInput").value;
+  const email = document.getElementById("emailInput").value.trim();
   const pass = document.getElementById("passwordInput").value;
   const conf = document.getElementById("confirmPasswordInput").value;
+  
   if (!email || !pass) { alert("Enter email and password!"); return; }
   if (pass !== conf) { alert("Passwords do not match!"); return; }
   if (pass.length < 6 || !/\d/.test(pass) || !/[A-Z]/.test(pass)) {
       alert("Password must be at least 6 characters long and include a number and an uppercase letter."); return;
   }
-  firebase.auth().createUserWithEmailAndPassword(email, pass).catch(error => alert(error.message));
+  
+  // Create the user
+  firebase.auth().createUserWithEmailAndPassword(email, pass)
+    .then((userCredential) => {
+        // Send the verification email immediately
+        userCredential.user.sendEmailVerification()
+          .then(() => {
+              alert("Account created successfully! We just sent a verification link to your email. You MUST click it before you can log in.");
+              // Sign them out so they don't bypass the verification
+              firebase.auth().signOut();
+              
+              // Flip the UI back to Login mode
+              if (isSignupMode) toggleAuthMode();
+          });
+    })
+    .catch(error => {
+        // Make error messages a bit more user-friendly
+        if(error.code === 'auth/email-already-in-use') {
+             alert("Bro, an account with that email already exists! Try logging in.");
+        } else {
+             alert(error.message);
+        }
+    });
 };
 
 window.login = function() {
