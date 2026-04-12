@@ -40,10 +40,18 @@ body {
   transition: color 0.15s ease, background 0.15s ease; backface-visibility: hidden; -webkit-font-smoothing: antialiased;
 }
 
-/* TOP BAR FIX */
-.top-bar {
-  position: absolute; top: 20px; right: 20px; display: flex; align-items: center; gap: 12px; z-index: 1000;
-}
+.pill { display: inline-block; padding: 6px 12px; border-radius: 20px; background: rgba(0,0,0,0.05); cursor: pointer; font-size: 12px; font-weight: 600; margin: 0 4px 8px 0; transition: 0.2s; color: var(--text); border: 1px solid var(--card-border); }
+.pill:hover { background: var(--primary); color: #fff; }
+.dark .pill { background: rgba(255,255,255,0.05); }
+
+.frog-card { background: linear-gradient(135deg, rgba(236, 72, 153, 0.15), rgba(99, 102, 241, 0.15)); border: 2px solid var(--secondary); margin-bottom: 15px;}
+.zen-mode .nav, .zen-mode .top-bar, .zen-mode .card:not(.focus-card), .zen-mode h2 { display: none !important; }
+.zen-mode .focus-card { transform: scale(1.1); margin-top: 15vh; border:none; box-shadow: 0 20px 50px rgba(0,0,0,0.3); background: var(--card);}
+.zen-mode body { background: #000; animation: none; }
+.vault-link { display:block; padding:10px; background:rgba(0,0,0,0.05); border-radius:8px; margin-bottom:8px; text-decoration:none; color:var(--primary); font-weight:bold; font-size:14px; word-break: break-all;}
+.dark .vault-link { background:rgba(255,255,255,0.05); color:var(--primary-hover); }
+
+.top-bar { position: absolute; top: 20px; right: 20px; display: flex; align-items: center; gap: 12px; z-index: 1000; }
 
 @keyframes gradientShift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
 @keyframes smoothFade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
@@ -52,12 +60,7 @@ body {
 
 .container { max-width: 420px; margin: auto; padding: 20px 16px 160px; }
 
-.theme-toggle {
-  width: 40px; height: 40px; border: 1px solid var(--card-border); border-radius: 50%;
-  background: var(--card); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
-  cursor: pointer; box-shadow: var(--shadow); transition: background 0.15s ease, border-color 0.15s ease, transform 0.3s ease;
-  display: flex; align-items: center; justify-content: center;
-}
+.theme-toggle { width: 40px; height: 40px; border: 1px solid var(--card-border); border-radius: 50%; background: var(--card); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur); cursor: pointer; box-shadow: var(--shadow); transition: background 0.15s ease, border-color 0.15s ease, transform 0.3s ease; display: flex; align-items: center; justify-content: center; }
 .theme-toggle:hover { transform: rotate(15deg) scale(1.05); }
 .theme-toggle svg { stroke: var(--text); transition: stroke 0.15s ease; }
 
@@ -66,45 +69,24 @@ body {
 .page.active.slide-right { animation: slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
 .page.active.slide-left { animation: slideInLeft 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
 
-.card {
-  background: var(--card); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
-  border: 1px solid var(--card-border); padding: 20px; border-radius: 24px; margin-top: 20px;
-  box-shadow: var(--shadow); transition: background 0.15s ease, border-color 0.15s ease, transform 0.3s ease, box-shadow 0.3s ease;
-}
+.card { background: var(--card); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur); border: 1px solid var(--card-border); padding: 20px; border-radius: 24px; margin-top: 20px; box-shadow: var(--shadow); transition: background 0.15s ease, border-color 0.15s ease, transform 0.3s ease, box-shadow 0.3s ease; }
 .card:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(0,0,0,0.15); }
 
-.nav {
-  position: fixed; bottom: calc(20px + env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%);
-  width: 90%; max-width: 400px; padding: 8px; display: flex; gap: 5px;
-  background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(255, 255, 255, 0.5); border-radius: 50px;
-  box-shadow: 0 10px 40px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.2); z-index: 100; overflow-x: auto; scrollbar-width: none; 
-}
+.nav { position: fixed; bottom: calc(20px + env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%); width: 90%; max-width: 400px; padding: 8px; display: flex; gap: 5px; background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border: 1px solid rgba(255, 255, 255, 0.5); border-radius: 50px; box-shadow: 0 10px 40px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.2); z-index: 100; overflow-x: auto; scrollbar-width: none; }
 .dark .nav { background: rgba(15, 23, 42, 0.35); border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 10px 40px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05); }
 .nav::-webkit-scrollbar { display: none; }
 .nav button { flex: 0 0 auto; min-width: 60px; border: none; background: none; padding: 12px; cursor: pointer; display: flex; justify-content: center; position: relative; z-index: 2; }
 .icon { width: 24px; height: 24px; stroke: var(--sub); fill: none; transition: stroke 0.15s ease; }
 .nav button.active .icon { stroke: #fff; }
 
-.indicator {
-  position: absolute; height: calc(100% - 16px); background: var(--primary); border-radius: 40px;
-  top: 8px; left: 8px; width: 60px; transition: cubic-bezier(0.68, -0.55, 0.265, 1.55) 0.4s; z-index: 1;
-}
+.indicator { position: absolute; height: calc(100% - 16px); background: var(--primary); border-radius: 40px; top: 8px; left: 8px; width: 60px; transition: cubic-bezier(0.68, -0.55, 0.265, 1.55) 0.4s; z-index: 1; }
 
 .input-group { display: flex; gap: 10px; margin-top: 15px; }
-input, textarea {
-  flex: 1; padding: 12px 16px; border: 1px solid var(--card-border); 
-  border-radius: 12px; background: rgba(0,0,0,0.03); color: var(--text);
-  font-family: inherit; box-sizing: border-box; width: 100%; transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
-}
+input, textarea { flex: 1; padding: 12px 16px; border: 1px solid var(--card-border); border-radius: 12px; background: rgba(0,0,0,0.03); color: var(--text); font-family: inherit; box-sizing: border-box; width: 100%; transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease; }
 .dark input, .dark textarea { background: rgba(255,255,255,0.05); }
 input:focus, textarea:focus { outline: none; border-color: var(--primary); background: transparent; }
 
-.add-btn {
-  padding: 12px 20px; border: none; border-radius: 12px; background: var(--primary);
-  color: #fff; cursor: pointer; font-weight: 600; box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-  transition: transform 0.2s ease, background 0.15s ease, opacity 0.2s ease;
-}
+.add-btn { padding: 12px 20px; border: none; border-radius: 12px; background: var(--primary); color: #fff; cursor: pointer; font-weight: 600; box-shadow: 0 4px 15px rgba(0,0,0,0.1); transition: transform 0.2s ease, background 0.15s ease, opacity 0.2s ease; }
 .add-btn:hover:not(:disabled) { transform: translateY(-2px); background: var(--primary-hover); }
 .add-btn:active:not(:disabled) { transform: translateY(0); }
 
@@ -142,7 +124,6 @@ li:hover { background: rgba(0,0,0,0.04); transform: translateX(4px); }
 .ai-panel{ position:fixed;bottom:0;width:100%;height:65%; background:var(--card); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur); border-top: 1px solid var(--card-border); display:none;flex-direction:column; border-radius:30px 30px 0 0; animation:slideUp .4s cubic-bezier(0.16, 1, 0.3, 1); z-index: 500; box-shadow:0 -10px 40px rgba(0,0,0,0.15); transition: background 0.15s ease, border-color 0.15s ease;}
 @keyframes slideUp{ from{transform:translateY(100%);} to{transform:translateY(0);} }
 
-/* NEW AI PANEL LAYOUT FIXES */
 .ai-header{ padding:15px 20px; display:flex; justify-content:space-between; align-items:center; font-weight:700; font-size: 16px; border-bottom: 1px solid rgba(0,0,0,0.05);}
 .dark .ai-header { border-bottom: 1px solid rgba(255,255,255,0.05); }
 .close-ai{ font-size:24px; cursor:pointer; color: var(--sub); transition:0.2s;}
@@ -155,7 +136,6 @@ li:hover { background: rgba(0,0,0,0.04); transform: translateX(4px); }
 .friend {background: var(--primary); color:#fff; align-self:flex-start; border-bottom-left-radius: 4px;}
 .dark .ai{background:rgba(255,255,255,.1);}
 
-/* HISTORY LIST STYLING */
 #aiHistoryArea { flex:1; overflow-y:auto; padding:20px; display:none; }
 .history-item { cursor:pointer; padding:12px; margin-bottom:8px; background:rgba(0,0,0,0.03); border-radius:12px; transition:0.2s; font-size: 14px; font-weight: 500;}
 .dark .history-item { background:rgba(255,255,255,0.05); }
@@ -242,9 +222,10 @@ h2 { margin-top: 0; font-weight: 800; letter-spacing: -0.5px;}
   <div class="card">
     <div class="sub">AI Study Suggestion</div>
     <div id="aiSuggestion" style="margin-top: 5px;">Click AI button</div>
+    <button class="adjust-btn" style="width:100%; margin-top:10px; font-size:12px;" onclick="generateMorningBrief()">☀️ Generate Morning Brief</button>
   </div>
 
-  <div class="card">
+  <div class="card focus-card">
     <div class="sub" id="timerLabel" style="text-align:center;">Focus Timer (30m Rule)</div>
     <div style="display:flex; align-items:center; justify-content:center; gap:20px; margin: 20px 0;">
       <button class="adjust-btn" onclick="adjustTime(-5)">-5m</button>
@@ -263,7 +244,18 @@ h2 { margin-top: 0; font-weight: 800; letter-spacing: -0.5px;}
 
 <div id="taskPage" class="page">
   <h2>Your Tasks</h2>
+  
+  <div id="priorityFrogContainer"></div>
+
   <div class="card">
+    <div class="sub" style="margin-bottom:10px;">Quick Categories</div>
+    <div>
+      <span class="pill" onclick="addCategory('[📚 Study]')">📚 Study</span>
+      <span class="pill" onclick="addCategory('[🏠 Chores]')">🏠 Chores</span>
+      <span class="pill" onclick="addCategory('[🏃 Gym]')">🏃 Gym</span>
+      <span class="pill" onclick="addCategory('[🎨 Project]')">🎨 Project</span>
+    </div>
+    
     <div class="input-group"><input id="taskInput" placeholder="What needs to be done?"></div>
     <div class="time-input-container">
       <div class="time-field"><input type="time" id="start" placeholder=" "><label for="start">Start Time</label></div>
@@ -281,7 +273,19 @@ h2 { margin-top: 0; font-weight: 800; letter-spacing: -0.5px;}
 </div>
 
 <div id="focusPage" class="page">
-  <h2>Focus Flow</h2>
+  <div style="display:flex; justify-content:space-between; align-items:center;">
+    <h2>Focus Flow</h2>
+    <button class="adjust-btn" style="font-size:12px; padding:4px 10px;" onclick="toggleZenMode()">🧘 Zen Mode</button>
+  </div>
+  
+  <div class="card" style="display:flex; justify-content:space-between; align-items:center;">
+    <div>
+       <div class="sub">Distractions Logged</div>
+       <div id="distractionCount" style="font-size: 24px; font-weight: 800; color: var(--secondary);">0</div>
+    </div>
+    <button class="adjust-btn" style="border-color: var(--secondary); color: var(--secondary);" onclick="addDistraction()">+1 Oops</button>
+  </div>
+
   <div class="card" style="padding: 15px;">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
       <div class="sub">Deep Focus Radio</div>
@@ -289,6 +293,7 @@ h2 { margin-top: 0; font-weight: 800; letter-spacing: -0.5px;}
     </div>
     <iframe id="musicWidget" style="border-radius:12px;" src="https://open.spotify.com/embed/playlist/37i9dQZF1DWZeKCadgRdKQ?utm_source=generator&theme=0" width="100%" height="152" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
   </div>
+
   <div class="card">
     <div class="sub">Session History</div>
     <div style="margin-top: 15px; text-align: center; color: var(--primary); font-size: 32px; font-weight: 800;" id="focusTotal">0</div>
@@ -298,8 +303,30 @@ h2 { margin-top: 0; font-weight: 800; letter-spacing: -0.5px;}
 
 <div id="habitPage" class="page">
   <h2>Habit Forge</h2>
-  <div class="card">
-    <div class="sub">Daily Habits</div>
+  
+  <div style="display:flex; gap:10px; margin-bottom:15px;">
+     <div class="card" style="flex:1; margin-top:0; text-align:center; padding:15px;">
+         <div class="sub">Habit Aura</div>
+         <div id="habitPlant" style="font-size:40px; margin:10px 0; transition:0.3s;">🌱</div>
+         <div id="habitPlantText" style="font-size:12px; font-weight:bold; color:var(--primary);">Seedling</div>
+     </div>
+     <div class="card" style="flex:1; margin-top:0; text-align:center; padding:15px;">
+         <div class="sub">Total Streaks</div>
+         <div id="habitTotalStreak" style="font-size:32px; font-weight:800; color:var(--secondary); margin:10px 0;">0</div>
+         <div style="font-size:12px; color:var(--sub);">Days Combined</div>
+     </div>
+  </div>
+
+  <div class="card" style="margin-top:0; margin-bottom:15px; padding: 15px;">
+      <div class="sub" style="margin-bottom:10px;">Forge New Habit</div>
+      <div style="display:flex; gap:10px;">
+         <input type="text" id="newHabitInput" placeholder="e.g. Read 10 Pages" style="margin-bottom:0; flex:1;">
+         <button class="add-btn" style="width:auto; margin-bottom:0; padding:10px 15px;" onclick="addHabit()">Add</button>
+      </div>
+  </div>
+
+  <div class="card" style="margin-top:0;">
+    <div class="sub">Daily Tracker</div>
     <ul id="habitList" style="padding:0; list-style:none;"></ul>
   </div>
 </div>
@@ -322,7 +349,7 @@ h2 { margin-top: 0; font-weight: 800; letter-spacing: -0.5px;}
   <div class="card" id="joinRoomCard">
     <div class="sub">Room Hub</div>
     <div style="font-size: 13px; margin: 10px 0; color: var(--sub);">Search, join, or create a live study room.</div>
-    <input type="text" id="roomCodeInput" placeholder="Search or Enter Room Code (e.g. MATH101)" style="text-transform: uppercase;">
+    <input type="text" id="roomCodeInput" placeholder="Search or Enter Room Code" style="text-transform: uppercase;">
     <input type="hidden" id="playerNameInput" placeholder="Your Name" style="margin-top:10px;">
     
     <div style="display:flex; gap:10px; margin-top:15px;">
@@ -346,9 +373,10 @@ h2 { margin-top: 0; font-weight: 800; letter-spacing: -0.5px;}
       </div>
 
       <div class="task-toggle" style="margin-top:10px; margin-bottom: 10px;">
-        <div class="toggle-indicator" id="roomToggleInd" style="width: calc(50% - 6px); left: 6px;"></div>
-        <button id="chatTabBtn" class="active" onclick="switchRoomTab('chat')">Live Chat</button>
-        <button id="canvasTabBtn" onclick="switchRoomTab('canvas')">Shared Canvas</button>
+        <div class="toggle-indicator" id="roomToggleInd" style="width: calc(33.3% - 6px); left: 6px;"></div>
+        <button id="chatTabBtn" class="active" onclick="switchRoomTab('chat')">Chat</button>
+        <button id="canvasTabBtn" onclick="switchRoomTab('canvas')">Canvas</button>
+        <button id="vaultTabBtn" onclick="switchRoomTab('vault')">Vault</button>
       </div>
 
       <div id="roomChatContainer" style="flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:10px; padding-right: 5px;"></div>
@@ -356,6 +384,15 @@ h2 { margin-top: 0; font-weight: 800; letter-spacing: -0.5px;}
       <div id="roomCanvasContainer" style="flex:1; display:none; flex-direction:column;">
         <div style="font-size: 12px; font-weight: bold; color: var(--secondary); margin-bottom: 5px;">📝 Whiteboard: Important Points</div>
         <textarea id="sharedCanvasArea" placeholder="Write down key formulas here... Everyone sees this live!" style="flex:1; resize:none; border-radius: 12px; padding: 15px; border: 2px solid var(--secondary); background: rgba(255,255,255,0.2);"></textarea>
+      </div>
+
+      <div id="roomVaultContainer" style="flex:1; display:none; flex-direction:column;">
+         <div style="font-size: 12px; font-weight: bold; color: var(--primary); margin-bottom: 5px;">🔗 Shared Resources</div>
+         <div id="vaultList" style="flex:1; overflow-y:auto;"></div>
+         <div style="display:flex; gap:10px; margin-top:10px;">
+            <input type="text" id="vaultLinkInput" placeholder="Paste a URL...">
+            <button class="add-btn" style="width:auto; padding:10px;" onclick="addVaultLink()">Add</button>
+         </div>
       </div>
 
       <div id="roomInputBox" style="display:flex; gap:10px; margin-top:10px; border-top: 1px solid var(--card-border); padding-top: 10px;">
@@ -434,7 +471,6 @@ let userNickname = localStorage.getItem("proNickname") || "Pro";
 firebase.initializeApp(firebaseConfig);
 db = firebase.firestore();
 
-/* === NEW AI HISTORY VARIABLES === */
 let currentAiSession = "chat_" + Date.now();
 let aiSessionList = JSON.parse(localStorage.getItem("proAiSessions")) || [];
 
@@ -469,26 +505,28 @@ async function loadFromCloud() {
   const doc = await userDocRef.get();
   if(doc.exists) {
     const data = doc.data();
-    if(data.tasks) tasks = data.tasks; if(data.userStats) userStats = data.userStats; if(data.habits) habits = data.habits;
+    if(data.tasks) tasks = data.tasks; 
+    if(data.userStats) { userStats = data.userStats; if(userStats.distractions === undefined) userStats.distractions = 0; }
+    if(data.habits) habits = data.habits;
     if(data.notes !== undefined) document.getElementById("mindDumpText").value = data.notes;
     if(data.nickname) { userNickname = data.nickname; localStorage.setItem("proNickname", userNickname); document.getElementById("playerNameInput").value = userNickname; }
     
-    // Load AI History 
     if(data.aiSessions) { aiSessionList = data.aiSessions; localStorage.setItem("proAiSessions", JSON.stringify(aiSessionList)); }
     
     checkDailyReset(); render(); renderHabits(); updateStreakUI(); updateClockAndGreeting();
+    document.getElementById("distractionCount").innerText = userStats.distractions || 0;
   }
 }
 
 let tasks = JSON.parse(localStorage.getItem("proTasks")) || [];
-let userStats = JSON.parse(localStorage.getItem("proStats")) || { pomodoros: 0, completedTasks: 0, streakDays: 0, lastActivityDate: null, lastResetDate: null };
-let habits = JSON.parse(localStorage.getItem("proHabits")) || [ { name: "💧 Drink Water", streak: 3, lastDone: "" } ];
+let userStats = JSON.parse(localStorage.getItem("proStats")) || { pomodoros: 0, completedTasks: 0, streakDays: 0, lastActivityDate: null, lastResetDate: null, distractions: 0 };
+let habits = JSON.parse(localStorage.getItem("proHabits")) || [ { name: "💧 Drink Water", streak: 3, lastDone: "", why: "To stay hydrated" } ];
 
 let interval = null; let running = false; let pomodoroRunning = false; let pomodoroMode = "work";
 let customWorkTime = 1800; let customBreakTime = 300; let workTime = customWorkTime; let breakTime = customBreakTime;
 
 function saveData() { localStorage.setItem("proTasks", JSON.stringify(tasks)); localStorage.setItem("proStats", JSON.stringify(userStats)); syncToCloud(); }
-function checkDailyReset() { const today = new Date().toDateString(); if (userStats.lastResetDate !== today) { if (userStats.lastResetDate !== null) tasks = tasks.filter(t => t.c === false); userStats.lastResetDate = today; saveData(); } }
+function checkDailyReset() { const today = new Date().toDateString(); if (userStats.lastResetDate !== today) { if (userStats.lastResetDate !== null) { tasks = tasks.filter(t => t.c === false); userStats.distractions = 0; } userStats.lastResetDate = today; saveData(); } }
 function updateClockAndGreeting() {
   const now = new Date(); let h = now.getHours(), m = now.getMinutes(), ampm = h >= 12 ? 'PM' : 'AM'; h = h % 12 || 12; m = m < 10 ? '0' + m : m;
   document.getElementById("clock").innerText = h + ':' + m + ' ' + ampm;
@@ -513,14 +551,88 @@ function checkStreakProgression() { const today = new Date().toDateString(); if 
 function updateStreakUI() { const percent = (userStats.streakDays / 7) * 100; if(document.getElementById("streakFillHome")) document.getElementById("streakFillHome").style.width = percent + "%"; if(document.getElementById("streakFillLeader")) document.getElementById("streakFillLeader").style.width = percent + "%"; if(document.getElementById("streakTextHome")) document.getElementById("streakTextHome").innerText = `Day ${userStats.streakDays} of 7 Completed`; if(document.getElementById("streakDayCount")) document.getElementById("streakDayCount").innerText = `${userStats.streakDays}/7 Days`; const claimBtn = document.getElementById("claimBtn"); if (claimBtn && userStats.streakDays >= 7) { claimBtn.style.opacity = "1"; claimBtn.style.cursor = "pointer"; claimBtn.disabled = false; claimBtn.style.background = "var(--secondary)"; } }
 window.claimReward = function() { alert("Weekly Badge Claimed! Incredible focus!"); userStats.streakDays = 0; saveData(); updateStreakUI(); }
 
+window.addCategory = function(cat) { const inp = document.getElementById("taskInput"); inp.value = cat + " " + inp.value; inp.focus(); }
+window.toggleZenMode = function() { document.body.classList.toggle('zen-mode'); }
+window.addDistraction = function() { userStats.distractions = (userStats.distractions || 0) + 1; document.getElementById("distractionCount").innerText = userStats.distractions; saveData(); }
+
 window.fillSuggestion = function(text, start, end) { document.getElementById("taskInput").value = text; document.getElementById("start").value = start; document.getElementById("end").value = end; }
 window.addTask = function(){ let t = document.getElementById("taskInput").value, s = document.getElementById("start").value, e = document.getElementById("end").value; if(!t || !s || !e) return; tasks.push({t,s,e,c:false}); saveData(); document.getElementById("latestTask").innerText = t; document.getElementById("taskInput").value = ""; document.getElementById("start").value = ""; document.getElementById("end").value = ""; render(); }
-function render(){ let taskList = document.getElementById("taskList"), completedList = document.getElementById("completedList"); taskList.innerHTML = ""; completedList.innerHTML = ""; let done = 0, activeCount = 0; tasks.forEach((x,i)=>{ let li = document.createElement("li"); li.innerHTML = `<div><strong>${x.t}</strong><br><small class="time">${x.s} - ${x.e}</small></div> ${!x.c ? `<button class="add-btn" style="padding: 8px 16px;" onclick="completeTask(${i})">Done</button>` : `<span class="time" style="font-weight:600; color:var(--primary);">Completed</span>`}`; if(x.c){ completedList.appendChild(li); done++; } else { taskList.appendChild(li); activeCount++; } }); if (activeCount === 0) { taskList.innerHTML = `<li style="flex-direction:column; background:transparent; border:2px dashed var(--card-border); box-shadow:none;"><div style="color:var(--sub); font-size:14px; text-align:center; width:100%; margin-bottom:12px;">Your queue is empty! Start fresh:</div><div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:center; width:100%;"><button class="adjust-btn" style="font-size:12px; padding:6px 12px;" onclick="fillSuggestion('Review Notes', '09:00', '09:45')">+ Review Notes</button></div></li>`; } const activeTasks = tasks.filter(t => !t.c); document.getElementById("latestTask").innerText = activeTasks.length > 0 ? activeTasks[activeTasks.length - 1].t : "None"; const queueDiv = document.getElementById("queue"); if(queueDiv) { if(activeTasks.length > 0) { queueDiv.innerHTML = activeTasks.slice(0, 3).map(t => `<div style="font-size:14px; margin-top:4px; font-weight:600;">• ${t.t}</div>`).join(''); } else { queueDiv.innerHTML = `<div style="font-size:14px; color:var(--sub); font-style:italic;">All caught up!</div>`; } } let percent = tasks.length ? Math.floor((done/tasks.length)*100) : 0; document.getElementById("progress").innerText = percent + "%"; document.getElementById("ring").style.strokeDashoffset = 314 - (percent / 100) * 314; if(document.getElementById("focusTotal")) document.getElementById("focusTotal").innerText = userStats.pomodoros; }
+
+function render(){ 
+  let taskList = document.getElementById("taskList"), completedList = document.getElementById("completedList"); taskList.innerHTML = ""; completedList.innerHTML = ""; let done = 0, activeCount = 0; 
+  
+  const activeTasks = tasks.filter(t => !t.c);
+  activeTasks.sort((a,b) => a.s.localeCompare(b.s)); 
+  const frogContainer = document.getElementById("priorityFrogContainer");
+  if(activeTasks.length > 0) {
+      const frog = activeTasks[0];
+      frogContainer.innerHTML = `<div class="card frog-card"><div class="sub" style="color:var(--secondary);">🐸 Priority Frog</div><div style="font-size:18px; font-weight:bold; margin-top:5px;">${frog.t}</div><div style="font-size:12px; color:var(--sub); margin-top:5px;">Starts at ${frog.s}</div></div>`;
+  } else { frogContainer.innerHTML = ""; }
+
+  const nowStr = new Date().toTimeString().slice(0,5);
+
+  tasks.forEach((x,i)=>{ 
+    let timeStatus = "";
+    if(!x.c && x.e < nowStr) timeStatus = `<span style="color:red; font-size:10px; font-weight:bold; margin-left:5px;">OVERDUE</span>`;
+    else if(!x.c && x.s <= nowStr) timeStatus = `<span style="color:var(--secondary); font-size:10px; font-weight:bold; margin-left:5px;">IN PROGRESS</span>`;
+
+    let li = document.createElement("li"); 
+    li.innerHTML = `<div><strong>${x.t}</strong>${timeStatus}<br><small class="time">${x.s} - ${x.e}</small></div> ${!x.c ? `<button class="add-btn" style="padding: 8px 16px;" onclick="completeTask(${i})">Done</button>` : `<span class="time" style="font-weight:600; color:var(--primary);">Completed</span>`}`; 
+    if(x.c){ completedList.appendChild(li); done++; } else { taskList.appendChild(li); activeCount++; } 
+  }); 
+
+  if (activeCount === 0) { taskList.innerHTML = `<li style="flex-direction:column; background:transparent; border:2px dashed var(--card-border); box-shadow:none;"><div style="color:var(--sub); font-size:14px; text-align:center; width:100%; margin-bottom:12px;">Your queue is empty! Start fresh:</div><div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:center; width:100%;"><button class="adjust-btn" style="font-size:12px; padding:6px 12px;" onclick="fillSuggestion('Review Notes', '09:00', '09:45')">+ Review Notes</button></div></li>`; } 
+  document.getElementById("latestTask").innerText = activeTasks.length > 0 ? activeTasks[activeTasks.length - 1].t : "None"; 
+  const queueDiv = document.getElementById("queue"); if(queueDiv) { if(activeTasks.length > 0) { queueDiv.innerHTML = activeTasks.slice(0, 3).map(t => `<div style="font-size:14px; margin-top:4px; font-weight:600;">• ${t.t}</div>`).join(''); } else { queueDiv.innerHTML = `<div style="font-size:14px; color:var(--sub); font-style:italic;">All caught up!</div>`; } } 
+  let percent = tasks.length ? Math.floor((done/tasks.length)*100) : 0; document.getElementById("progress").innerText = percent + "%"; document.getElementById("ring").style.strokeDashoffset = 314 - (percent / 100) * 314; if(document.getElementById("focusTotal")) document.getElementById("focusTotal").innerText = userStats.pomodoros; 
+}
+
+setInterval(render, 60000);
+
 window.completeTask = function(i){ tasks[i].c = true; userStats.completedTasks++; saveData(); render(); }
 window.showActive = function(){ document.getElementById("taskList").style.display="block"; document.getElementById("completedList").style.display="none"; document.getElementById("activeBtn").classList.add("active"); document.getElementById("completedBtn").classList.remove("active"); document.querySelector(".toggle-indicator").style.left = "6px"; }
 window.showCompleted = function(){ document.getElementById("taskList").style.display="none"; document.getElementById("completedList").style.display="block"; document.getElementById("activeBtn").classList.remove("active"); document.getElementById("completedBtn").classList.add("active"); document.querySelector(".toggle-indicator").style.left = "calc(50% - 3px)"; }
 
-function renderHabits() { const list = document.getElementById("habitList"); if (!list) return; list.innerHTML = ""; const today = new Date().toDateString(); if (habits.length === 0) { list.innerHTML = `<li style="background:transparent; border:2px dashed var(--card-border); box-shadow:none; justify-content:center; color:var(--sub); font-size:14px;">No habits tracked yet!</li>`; } habits.forEach((h, i) => { const isDoneToday = h.lastDone === today; let li = document.createElement("li"); li.innerHTML = `<div><strong>${h.name}</strong><br><small class="time">Streak: ${h.streak} Days</small></div> <button class="add-btn" style="padding: 8px 16px; ${isDoneToday ? 'opacity:0.5; cursor:not-allowed;' : ''}" onclick="completeHabit(${i})" ${isDoneToday ? 'disabled' : ''}>${isDoneToday ? 'Done' : 'Complete'}</button>`; list.appendChild(li); }); }
+window.addHabit = function() {
+    const name = document.getElementById("newHabitInput").value.trim();
+    if(!name) return;
+    habits.push({ name: name, streak: 0, lastDone: "", why: "" });
+    document.getElementById("newHabitInput").value = "";
+    saveData(); renderHabits();
+}
+
+window.updateHabitWhy = function(i, val) { habits[i].why = val; saveData(); }
+
+function renderHabits() { 
+  const list = document.getElementById("habitList"); if (!list) return; list.innerHTML = ""; const today = new Date().toDateString(); 
+  
+  let totalStreak = 0; habits.forEach(h => totalStreak += h.streak);
+  if(document.getElementById("habitTotalStreak")) document.getElementById("habitTotalStreak").innerText = totalStreak;
+  
+  let plant = "🌱", pText = "Seedling";
+  if(totalStreak > 30) { plant = "🌲"; pText = "Ancient Tree"; }
+  else if(totalStreak > 15) { plant = "🌳"; pText = "Strong Tree"; }
+  else if(totalStreak > 5) { plant = "🌿"; pText = "Growing Plant"; }
+  
+  if(document.getElementById("habitPlant")) {
+      document.getElementById("habitPlant").innerText = plant;
+      document.getElementById("habitPlantText").innerText = pText;
+  }
+
+  if (habits.length === 0) { list.innerHTML = `<li style="background:transparent; border:2px dashed var(--card-border); box-shadow:none; justify-content:center; color:var(--sub); font-size:14px;">No habits tracked yet!</li>`; return; } 
+  
+  habits.forEach((h, i) => { 
+      const isDoneToday = h.lastDone === today; let li = document.createElement("li"); li.style.flexDirection = "column"; li.style.alignItems = "stretch";
+      li.innerHTML = `
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+           <div><strong>${h.name}</strong><br><small class="time">Streak: ${h.streak} Days</small></div> 
+           <button class="add-btn" style="width:auto; padding: 8px 16px; margin-bottom:0; ${isDoneToday ? 'opacity:0.5; cursor:not-allowed;' : ''}" onclick="completeHabit(${i})" ${isDoneToday ? 'disabled' : ''}>${isDoneToday ? 'Done' : 'Complete'}</button>
+        </div>
+        <input type="text" placeholder="Why? (e.g. To stay healthy)" onchange="updateHabitWhy(${i}, this.value)" value="${h.why || ''}" style="margin-top:10px; margin-bottom:0; font-size:12px; padding:8px; border:none; background:rgba(0,0,0,0.05);">
+      `; 
+      list.appendChild(li); 
+  }); 
+}
 window.completeHabit = function(i) { const today = new Date().toDateString(); if (habits[i].lastDone === today) return; let yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1); if (habits[i].lastDone === yesterday.toDateString()) habits[i].streak++; else if (habits[i].lastDone !== today) habits[i].streak = 1; habits[i].lastDone = today; localStorage.setItem("proHabits", JSON.stringify(habits)); syncToCloud(); renderHabits(); }
 
 let notesTimeout = null; document.getElementById("mindDumpText").addEventListener("input", function() { localStorage.setItem("proNotes", this.value); clearTimeout(notesTimeout); notesTimeout = setTimeout(() => { syncToCloud(); }, 1500); });
@@ -528,9 +640,13 @@ window.saveNotes = function() { const text = document.getElementById("mindDumpTe
 window.analyzeNotes = function() { const text = document.getElementById("mindDumpText").value; if(!text.trim()) { alert("Write something in the Mind Dump first!"); return; } const panel = document.getElementById("aiPanel"); if(panel.style.display !== "flex") toggleAI(); document.getElementById("aiInput").value = "Please organize these messy thoughts into a clear study plan: " + text; sendAI(); }
 window.toggleAI = function(){ const panel = document.getElementById("aiPanel"); panel.style.display = panel.style.display === "flex" ? "none" : "flex"; }
 
-/* =======================================
-   UPGRADED: GEMINI AI WITH CHAT HISTORY 
-======================================= */
+window.generateMorningBrief = function() {
+    toggleAI();
+    const prompt = `Act as my Pro Assistant. Generate a quick, encouraging Morning Brief. I have ${tasks.filter(t=>!t.c).length} tasks left today, and a streak of ${userStats.streakDays} days. Keep it short and motivating!`;
+    document.getElementById("aiInput").value = prompt;
+    sendAI();
+}
+
 window.newAiChat = function() {
     currentAiSession = "chat_" + Date.now();
     document.getElementById("chat").innerHTML = `<div class="msg ai">New chat started! How can I help you today?</div>`;
@@ -540,95 +656,97 @@ window.newAiChat = function() {
 }
 
 window.toggleAiHistory = function() {
-    const histArea = document.getElementById("aiHistoryArea");
-    const chatArea = document.getElementById("chat");
-    const inputBox = document.getElementById("aiInputBox");
-    
+    const histArea = document.getElementById("aiHistoryArea"); const chatArea = document.getElementById("chat"); const inputBox = document.getElementById("aiInputBox");
     if(histArea.style.display === "none") {
         histArea.style.display = "block"; chatArea.style.display = "none"; inputBox.style.display = "none";
-        
-        // Render the list of past sessions
         const list = document.getElementById("aiHistoryList"); list.innerHTML = "";
         if(aiSessionList.length === 0) list.innerHTML = "<div style='font-size:13px; color:var(--sub);'>No history saved yet.</div>";
-        [...aiSessionList].reverse().forEach(sess => {
-            list.innerHTML += `<div class="history-item" onclick="loadPastChat('${sess.id}')">💬 ${sess.title}</div>`;
-        });
-    } else {
-        histArea.style.display = "none"; chatArea.style.display = "flex"; inputBox.style.display = "flex";
-    }
+        [...aiSessionList].reverse().forEach(sess => { list.innerHTML += `<div class="history-item" onclick="loadPastChat('${sess.id}')">💬 ${sess.title}</div>`; });
+    } else { histArea.style.display = "none"; chatArea.style.display = "flex"; inputBox.style.display = "flex"; }
 }
 
 window.loadPastChat = async function(sessionId) {
-    currentAiSession = sessionId;
-    document.getElementById("aiHistoryArea").style.display = "none";
-    const chatDiv = document.getElementById("chat");
-    chatDiv.style.display = "flex"; document.getElementById("aiInputBox").style.display = "flex";
+    currentAiSession = sessionId; document.getElementById("aiHistoryArea").style.display = "none";
+    const chatDiv = document.getElementById("chat"); chatDiv.style.display = "flex"; document.getElementById("aiInputBox").style.display = "flex"; 
     chatDiv.innerHTML = `<div class="msg ai">Loading cloud memory...</div>`;
-
+    
     if(db && myUserId) {
-        const snapshot = await db.collection("users").doc(myUserId).collection("ai_chats").where("sessionId", "==", sessionId).orderBy("createdAt").get();
-        chatDiv.innerHTML = "";
-        if(snapshot.empty) chatDiv.innerHTML = `<div class="msg ai">I couldn't find any memory for this chat.</div>`;
-        snapshot.forEach(doc => {
-            const data = doc.data(); const divClass = data.role === "user" ? "user" : "ai";
-            chatDiv.innerHTML += `<div class="msg ${divClass}">${data.text.replace(/\n/g, "<br>")}</div>`;
-        });
-        chatDiv.scrollTop = chatDiv.scrollHeight;
+        try {
+            const snapshot = await db.collection("users").doc(myUserId).collection("ai_chats").where("sessionId", "==", sessionId).get();
+            chatDiv.innerHTML = ""; 
+            
+            if(snapshot.empty) {
+                chatDiv.innerHTML = `<div class="msg ai">I couldn't find any memory for this chat.</div>`;
+            } else {
+                let msgs = [];
+                snapshot.forEach(doc => msgs.push(doc.data()));
+                
+                msgs.sort((a,b) => {
+                    let timeA = a.createdAt ? a.createdAt.toMillis() : 0;
+                    let timeB = b.createdAt ? b.createdAt.toMillis() : 0;
+                    return timeA - timeB;
+                });
+
+                msgs.forEach(data => { 
+                    const divClass = data.role === "user" ? "user" : "ai"; 
+                    chatDiv.innerHTML += `<div class="msg ${divClass}">${data.text.replace(/\n/g, "<br>")}</div>`; 
+                });
+            }
+            chatDiv.scrollTop = chatDiv.scrollHeight;
+        } catch (err) {
+            console.error(err);
+            chatDiv.innerHTML = `<div class="msg ai">Oops, failed to load history from cloud.</div>`;
+        }
     }
 }
 
 window.sendAI = async function() {
   const input = document.getElementById("aiInput"); const chat = document.getElementById("chat"); const userText = input.value.trim();
   if(!userText) return; 
-  
   chat.innerHTML += `<div class="msg user">${userText}</div>`; input.value = ""; chat.scrollTop = chat.scrollHeight;
   const typingDiv = document.createElement("div"); typingDiv.className = "msg ai"; typingDiv.innerText = "Thinking..."; chat.appendChild(typingDiv); chat.scrollTop = chat.scrollHeight;
-
-  // Session Management: Save the title if it's the first message of this session
-  if(!aiSessionList.find(s => s.id === currentAiSession)) {
-      aiSessionList.push({ id: currentAiSession, title: userText.substring(0, 25) + "..." });
-      syncToCloud(); // Save session list to Firebase
+  
+  if(!aiSessionList.find(s => s.id === currentAiSession)) { 
+      aiSessionList.push({ id: currentAiSession, title: userText.substring(0, 25) + "..." }); 
+      localStorage.setItem("proAiSessions", JSON.stringify(aiSessionList));
+      syncToCloud(); 
   }
-
-  // Save USER message to History
   if(db && myUserId) { db.collection("users").doc(myUserId).collection("ai_chats").add({ sessionId: currentAiSession, role: "user", text: userText, createdAt: firebase.firestore.FieldValue.serverTimestamp() }); }
 
-  const GEMINI_API_KEY = "YOUR_API_KEY_HERE"; 
-  const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
-
+  /* 🔒 SECURE: USING CLOUDFLARE WORKER (NO API KEY IN FRONTEND) 🔒 */
+  const WORKER_URL = "https://misty-mode-365epro-study-ai.vakkenakunta.workers.dev"; // <-- PASTE YOUR CLOUDFLARE WORKER URL HERE
+  
   try {
-    const response = await fetch(API_URL, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ contents: [{ parts: [{ text: userText }] }] }) });
+    const response = await fetch(WORKER_URL, { 
+        method: "POST", 
+        headers: { "Content-Type": "application/json" }, 
+        body: JSON.stringify({ prompt: userText }) 
+    });
+    
     if (!response.ok) throw new Error("API Error");
     const data = await response.json(); const aiText = data.candidates[0].content.parts[0].text;
     typingDiv.innerHTML = aiText.replace(/\n/g, "<br>"); 
-
-    // Save AI response to History
+    
     if(db && myUserId) { db.collection("users").doc(myUserId).collection("ai_chats").add({ sessionId: currentAiSession, role: "ai", text: aiText, createdAt: firebase.firestore.FieldValue.serverTimestamp() }); }
-  } catch (error) { console.error(error); typingDiv.innerText = "Error connecting to AI. Did you add your API key?"; }
+  } catch (error) { 
+      console.error(error); 
+      typingDiv.innerText = "Error connecting to AI. Is your Cloudflare Worker URL correct?"; 
+  }
   chat.scrollTop = chat.scrollHeight;
 }
 
-/* =======================================
-   UPGRADED: LIVE CLOUD ROOMS WITH ACTIVE USERS
-======================================= */
 let currentRoom = null; let unsubRoomDetails = null; let unsubChat = null;
 
 window.createRoom = function() { const code = "ROOM-" + Math.floor(1000 + Math.random() * 9000); document.getElementById("roomCodeInput").value = code; if(!document.getElementById("playerNameInput").value) { document.getElementById("playerNameInput").value = userNickname; } joinRoom(); }
 
 window.joinRoom = function() {
   if(!db || !myUserId) { alert("Please log in and add Firebase keys!"); return; }
-  const code = document.getElementById("roomCodeInput").value.toUpperCase().trim();
-  if(!code) return; currentRoom = code;
-  
+  const code = document.getElementById("roomCodeInput").value.toUpperCase().trim(); if(!code) return; currentRoom = code;
   document.getElementById("joinRoomCard").style.display = "none"; document.getElementById("activeRoomArea").style.display = "flex";
   document.getElementById("roomTitle").innerText = code; document.getElementById("roomChatContainer").innerHTML = "";
 
-  // 1. ADD USER TO ACTIVE LIST
-  db.collection("rooms").doc(currentRoom).set({
-      activeUsers: firebase.firestore.FieldValue.arrayUnion(myUserId)
-  }, { merge: true });
+  db.collection("rooms").doc(currentRoom).set({ activeUsers: firebase.firestore.FieldValue.arrayUnion(myUserId) }, { merge: true });
 
-  // 2. LISTEN TO CHAT MESSAGES
   unsubChat = db.collection("rooms").doc(currentRoom).collection("messages").orderBy("createdAt").onSnapshot((snapshot) => {
         const chatBox = document.getElementById("roomChatContainer"); chatBox.innerHTML = "";
         snapshot.forEach((doc) => {
@@ -640,47 +758,48 @@ window.joinRoom = function() {
         chatBox.scrollTop = chatBox.scrollHeight;
     });
 
-  // 3. LISTEN TO ROOM DATA (Canvas + Active User Count)
   unsubRoomDetails = db.collection("rooms").doc(currentRoom).onSnapshot((doc) => { 
       if(doc.exists) {
           const data = doc.data();
-          
-          // Update the "🟢 X Active" Badge
           const count = data.activeUsers ? data.activeUsers.length : 0;
           document.getElementById("roomActiveCount").innerText = `${count} Active 🟢`;
-
-          // Sync Canvas
           if(!isTypingCanvas) document.getElementById("sharedCanvasArea").value = data.canvasText || ""; 
+          
+          const vaultDiv = document.getElementById("vaultList");
+          if(data.vaultLinks && data.vaultLinks.length > 0) {
+              vaultDiv.innerHTML = data.vaultLinks.map(link => `<a href="${link}" target="_blank" class="vault-link">${link}</a>`).join('');
+          } else { vaultDiv.innerHTML = "<div style='font-size:12px; color:var(--sub); text-align:center; padding:20px;'>No resources shared yet.</div>"; }
       } 
   });
 }
 
 window.leaveRoom = function() {
-  if(!currentRoom) return;
-  // Remove user from active array
-  db.collection("rooms").doc(currentRoom).update({ activeUsers: firebase.firestore.FieldValue.arrayRemove(myUserId) });
-  
+  if(!currentRoom) return; db.collection("rooms").doc(currentRoom).update({ activeUsers: firebase.firestore.FieldValue.arrayRemove(myUserId) });
   if(unsubChat) unsubChat(); if(unsubRoomDetails) unsubRoomDetails(); currentRoom = null;
   document.getElementById("activeRoomArea").style.display = "none"; document.getElementById("joinRoomCard").style.display = "block"; document.getElementById("roomCodeInput").value = "";
 }
 
-// Ensure they are removed from the room if they literally close the browser tab
-window.addEventListener("beforeunload", () => {
-    if(currentRoom && db && myUserId) {
-        db.collection("rooms").doc(currentRoom).update({ activeUsers: firebase.firestore.FieldValue.arrayRemove(myUserId) });
-    }
-});
+window.addEventListener("beforeunload", () => { if(currentRoom && db && myUserId) { db.collection("rooms").doc(currentRoom).update({ activeUsers: firebase.firestore.FieldValue.arrayRemove(myUserId) }); } });
 
 window.switchRoomTab = function(tab) {
-  const chatBtn = document.getElementById("chatTabBtn"); const canvasBtn = document.getElementById("canvasTabBtn");
-  const chatArea = document.getElementById("roomChatContainer"); const canvasArea = document.getElementById("roomCanvasContainer"); const ind = document.getElementById("roomToggleInd");
-  if(tab === 'chat') { chatArea.style.display = "flex"; canvasArea.style.display = "none"; chatBtn.classList.add("active"); canvasBtn.classList.remove("active"); ind.style.left = "6px"; document.getElementById("roomInputBox").style.display = "flex";
-  } else { chatArea.style.display = "none"; canvasArea.style.display = "flex"; chatBtn.classList.remove("active"); canvasBtn.classList.add("active"); ind.style.left = "calc(50% - 3px)"; document.getElementById("roomInputBox").style.display = "none"; }
+  const chatArea = document.getElementById("roomChatContainer"); const canvasArea = document.getElementById("roomCanvasContainer"); const vaultArea = document.getElementById("roomVaultContainer");
+  const ind = document.getElementById("roomToggleInd");
+  document.querySelectorAll(".task-toggle button").forEach(b => b.classList.remove("active"));
+  document.getElementById(tab+"TabBtn").classList.add("active");
+  
+  if(tab === 'chat') { chatArea.style.display = "flex"; canvasArea.style.display = "none"; vaultArea.style.display="none"; ind.style.left = "6px"; document.getElementById("roomInputBox").style.display = "flex";
+  } else if(tab === 'canvas') { chatArea.style.display = "none"; canvasArea.style.display = "flex"; vaultArea.style.display="none"; ind.style.left = "calc(33.3% + 2px)"; document.getElementById("roomInputBox").style.display = "none";
+  } else { chatArea.style.display = "none"; canvasArea.style.display = "none"; vaultArea.style.display="flex"; ind.style.left = "calc(66.6% - 2px)"; document.getElementById("roomInputBox").style.display = "none"; }
 }
 
-window.sendRoomMsg = function() {
-  const input = document.getElementById("roomMsgInput"); const text = input.value; if(!text.trim() || !currentRoom || !db) return; input.value = "";
-  db.collection("rooms").doc(currentRoom).collection("messages").add({ text: text, userId: myUserId, name: userNickname, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+window.sendRoomMsg = function() { const input = document.getElementById("roomMsgInput"); const text = input.value; if(!text.trim() || !currentRoom || !db) return; input.value = ""; db.collection("rooms").doc(currentRoom).collection("messages").add({ text: text, userId: myUserId, name: userNickname, createdAt: firebase.firestore.FieldValue.serverTimestamp() }); }
+
+window.addVaultLink = function() {
+    const input = document.getElementById("vaultLinkInput"); const url = input.value.trim();
+    if(!url || !currentRoom || !db) return;
+    const finalUrl = url.startsWith('http') ? url : 'https://' + url;
+    db.collection("rooms").doc(currentRoom).update({ vaultLinks: firebase.firestore.FieldValue.arrayUnion(finalUrl) });
+    input.value = "";
 }
 
 let canvasTimeout = null; let isTypingCanvas = false;
@@ -689,9 +808,6 @@ document.getElementById("sharedCanvasArea").addEventListener("input", function(e
     canvasTimeout = setTimeout(() => { db.collection("rooms").doc(currentRoom).set({ canvasText: val }, { merge: true }).then(() => { isTypingCanvas = false; }); }, 500); 
 });
 
-/* =========================
-   GESTURES & NAV
-========================= */
 window.stopMusic = function() { const iframe = document.getElementById("musicWidget"); if (iframe) { const currentSrc = iframe.src; iframe.src = ""; setTimeout(() => { iframe.src = currentSrc; }, 100); } }
 let touchStartX = 0, touchEndX = 0; document.addEventListener('touchstart', e => { if (e.target.closest('.nav') || e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.closest('.ai-panel')) return; touchStartX = e.changedTouches[0].screenX; }, {passive: true});
 document.addEventListener('touchend', e => { if (e.target.closest('.nav') || e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.closest('.ai-panel')) return; touchEndX = e.changedTouches[0].screenX; handleSwipe(); }, {passive: true});
