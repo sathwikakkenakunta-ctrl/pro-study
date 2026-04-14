@@ -424,6 +424,144 @@ select option{background:var(--card); color:var(--text);}
   display: flex; align-items: center; justify-content: center; font-size: 28px; 
   box-shadow: 0 4px 15px rgba(0,0,0,0.1); color: #fff;
 }
+/* ─── HABIT FORGE PRO REDESIGN (VIBRANT EDITION) ─── */
+.habit-card {
+  background: var(--card);
+  border: 1.5px solid var(--card-border);
+  padding: 16px;
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s, background 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+.habit-card:hover { 
+  transform: translateY(-4px); 
+  box-shadow: 0 12px 30px rgba(108, 99, 255, 0.2); 
+  border-color: var(--primary);
+}
+
+/* Bright glowing completed state */
+.habit-card.completed {
+  background: linear-gradient(135deg, rgba(6, 214, 160, 0.15), rgba(6, 214, 160, 0.05));
+  border-color: var(--green);
+  box-shadow: 0 8px 25px rgba(6, 214, 160, 0.15);
+}
+
+/* Vibrant Icon Wrapper */
+.habit-icon-wrap {
+  width: 48px; height: 48px; border-radius: 14px;
+  background: linear-gradient(135deg, rgba(108, 99, 255, 0.15), rgba(247, 37, 133, 0.15));
+  border: 1px solid rgba(108, 99, 255, 0.3);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 24px; flex-shrink: 0; transition: 0.3s;
+  box-shadow: inset 0 0 10px rgba(255,255,255,0.5);
+}
+.dark .habit-icon-wrap { background: linear-gradient(135deg, rgba(129, 140, 248, 0.2), rgba(244, 114, 182, 0.2)); box-shadow: none; }
+
+/* Pop animation on complete */
+.habit-card.completed .habit-icon-wrap { 
+  transform: scale(0.9); opacity: 0.8; 
+  background: rgba(6, 214, 160, 0.2);
+  border-color: var(--green);
+}
+
+.habit-info { flex: 1; }
+.habit-title { font-size: 15px; font-weight: 800; margin-bottom: 4px; transition: color 0.2s; }
+.habit-card.completed .habit-title { text-decoration: line-through; color: var(--green); opacity: 0.8; }
+.habit-streak { font-size: 12px; color: var(--orange); font-weight: 800; letter-spacing: 0.5px; }
+
+/* The Glowing Checkbox */
+.habit-check {
+  width: 32px; height: 32px; border-radius: 50%;
+  border: 2.5px solid var(--primary);
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); flex-shrink: 0;
+  background: rgba(108, 99, 255, 0.05);
+}
+.habit-card.completed .habit-check {
+  background: var(--green); 
+  border-color: var(--green); 
+  transform: scale(1.15);
+  box-shadow: 0 0 15px rgba(6, 214, 160, 0.6); /* Neon glow effect */
+}
+.habit-check svg {
+  width: 18px; height: 18px; stroke: #fff; fill: none; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round;
+  opacity: 0; transform: scale(0.5); transition: all 0.2s;
+}
+.habit-card.completed .habit-check svg { opacity: 1; transform: scale(1); }
+
+.habit-delete {
+  background: none; border: none; color: var(--sub); font-size: 18px; padding: 5px; cursor: pointer;
+  opacity: 0.4; transition: 0.2s;
+}
+.habit-delete:hover { color: var(--secondary); opacity: 1; transform: scale(1.2); }
+/* ─── GLOBAL TRANSLUCENT SEARCH BAR & AI BUTTON ─── */
+.top-center-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px; /* Spacing between search and AI button */
+}
+
+/* ─── GLOBAL TRANSLUCENT SEARCH BAR & AI BUTTON ─── */
+.top-center-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px; /* Spacing between search and AI button */
+}
+
+.global-search-container {
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 50px;
+  padding: 6px 12px;
+  width: 120px; /* Reduced default width */
+  transition: width 0.3s ease, background 0.3s ease, box-shadow 0.3s ease, border-color 0.3s;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+/* Expands slightly when tapped */
+.global-search-container:focus-within {
+  width: 165px; /* Reduced expanded width */
+  background: rgba(255, 255, 255, 0.4);
+  box-shadow: 0 4px 20px rgba(108, 99, 255, 0.15);
+  border-color: var(--primary);
+}
+
+.dark .global-search-container {
+  background: rgba(0, 0, 0, 0.25);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+.dark .global-search-container:focus-within {
+  background: rgba(0, 0, 0, 0.4);
+  border-color: var(--primary);
+}
+
+.search-icon { width: 14px; height: 14px; stroke: var(--text); opacity: 0.6; margin-right: 6px; }
+
+#globalSearch {
+  border: none; background: transparent; outline: none;
+  color: var(--text); font-family: var(--font);
+  font-size: 13px; font-weight: 600; width: 100%; padding: 0;
+}
+#globalSearch::placeholder { color: var(--text); opacity: 0.5; }
+
+/* New Top AI Button */
+.top-ai-btn {
+  width: 34px; height: 34px; border-radius: 50%; border: none;
+  background: linear-gradient(135deg, var(--secondary), var(--primary));
+  color: #fff; cursor: pointer; display: flex; justify-content: center; align-items: center;
+  box-shadow: 0 4px 12px rgba(247, 37, 133, 0.3); transition: transform 0.2s, box-shadow 0.2s;
+  pointer-events: auto;
+}
+.top-ai-btn:hover { transform: scale(1.1) rotate(-5deg); box-shadow: 0 6px 16px rgba(247, 37, 133, 0.5); }
+.top-ai-btn svg { width: 18px; height: 18px; stroke: #fff; stroke-width: 2; fill: none; }
 </style>
 </head>
 <body>
@@ -459,6 +597,22 @@ select option{background:var(--card); color:var(--text);}
       <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
     </svg>
   </button>
+
+  <div class="top-center-wrapper">
+    <div class="global-search-container">
+      <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      </svg>
+      <input type="text" id="globalSearch" placeholder="Ask AI..." onkeypress="handleGlobalSearch(event)">
+    </div>
+    
+    <button class="top-ai-btn" onclick="toggleAI()" title="Pro Assistant">
+      <svg viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="10"/><circle cx="9" cy="10" r="1" fill="#fff"/><circle cx="15" cy="10" r="1" fill="#fff"/><path d="M8 15C9 16 15 16 16 15"/>
+      </svg>
+    </button>
+  </div>
+
   <div style="display:flex; gap:10px;">
     <button class="settings-toggle" id="miniGamesBtn" onclick="openMiniGames()" style="display:flex;">
       <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:22px; height:22px; stroke:var(--text); fill:none;">
@@ -839,39 +993,34 @@ select option{background:var(--card); color:var(--text);}
 </div>
 
 <div id="habitPage" class="page">
-  <div style="margin-top:60px;"><h2 data-i18n="habit_forge">Habit Forge</h2></div>
+  <div style="margin-top:60px; margin-bottom: 15px;"><h2 data-i18n="habit_forge">Habit Forge</h2></div>
 
-  <div class="card">
-    <div class="sub">Add Habit</div>
-    <div style="display:flex;gap:8px;margin-top:10px;">
-      <input id="habitInput" placeholder="New habit..." style="flex:1;">
-      <select id="habitEmoji" style="width:60px;padding:12px 6px;text-align:center;">
+  <div class="card" style="margin-top: 0; background: linear-gradient(135deg, rgba(76, 201, 240, 0.25), rgba(108, 99, 255, 0.15)); border: 1.5px solid var(--accent); box-shadow: 0 8px 25px rgba(76, 201, 240, 0.2);">
+    <div style="display:flex;justify-content:space-between;align-items:center;">
+      <div class="sub" data-i18n="hydration" style="color: var(--text); font-weight: 900; letter-spacing: 1px;">Hydration Tracker</div>
+      <div style="font-weight:900;color:var(--accent);font-family:var(--mono); font-size: 18px; text-shadow: 0 0 10px rgba(76, 201, 240, 0.5);" id="waterCount">0/8 💧</div>
+    </div>
+    <div class="water-cups" id="waterCups" style="justify-content: space-between; margin-top: 15px;"></div>
+    <div class="bar-track" style="margin-top:15px; height: 8px; background: rgba(0,0,0,0.1);">
+      <div class="bar-fill" id="waterBar" style="width:0%; background:linear-gradient(90deg, var(--accent), var(--primary)); box-shadow: 0 0 10px var(--accent);"></div>
+    </div>
+  </div>
+
+  <div style="margin-top: 20px;">
+    <div class="sub" data-i18n="daily_habits" style="margin-bottom: 10px; margin-left: 5px;">Your Daily Habits</div>
+    <ul id="habitList" style="padding:0;list-style:none;display:flex;flex-direction:column;gap:12px;"></ul>
+  </div>
+
+  <div class="card" style="margin-top: 30px; border-style: dashed;">
+    <div class="sub">Create New Habit</div>
+    <div style="display:flex;gap:8px;margin-top:12px;">
+      <select id="habitEmoji" style="width:65px;padding:12px 6px;text-align:center;font-size:20px;border-radius:14px; border: 1.5px solid var(--card-border); background: var(--card); color: var(--text);">
         <option>💪</option><option>📚</option><option>💧</option><option>🧘</option>
         <option>🏃</option><option>🍎</option><option>✍️</option><option>😴</option>
       </select>
+      <input id="habitInput" placeholder="E.g., Read 10 pages..." style="flex:1;border-radius:14px;">
     </div>
-    <button class="btn" style="width:100%;margin-top:10px;" onclick="addHabit()" data-i18n="add_habit">＋ Add Habit</button>
-  </div>
-
-  <div class="card">
-    <div style="display:flex;justify-content:space-between;align-items:center;">
-      <div class="sub" data-i18n="hydration">Hydration Tracker</div>
-      <div style="font-weight:900;color:var(--accent);font-family:var(--mono);" id="waterCount">0/8 💧</div>
-    </div>
-    <div class="water-cups" id="waterCups"></div>
-    <div class="bar-track" style="margin-top:10px;">
-      <div class="bar-fill" id="waterBar" style="width:0%;background:linear-gradient(90deg,var(--accent),#0ea5e9);"></div>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="sub" data-i18n="daily_habits">Daily Habits</div>
-    <ul id="habitList" style="padding:0;list-style:none;margin-top:8px;"></ul>
-  </div>
-
-  <div class="card">
-    <div class="sub">7-Day Streak</div>
-    <div id="streakDots" style="margin-top:12px;"></div>
+    <button class="btn" style="width:100%;margin-top:12px;border-radius:14px;" onclick="addHabit()" data-i18n="add_habit">＋ Add Habit</button>
   </div>
 </div>
 
@@ -1080,12 +1229,6 @@ select option{background:var(--card); color:var(--text);}
     <svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
   </button>
 </div>
-
-<button class="ai-btn" onclick="toggleAI()">
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2">
-    <circle cx="12" cy="12" r="10"/><circle cx="9" cy="10" r="1" fill="#fff"/><circle cx="15" cy="10" r="1" fill="#fff"/><path d="M8 15C9 16 15 16 16 15"/>
-  </svg>
-</button>
 
 <div id="aiPanel" class="ai-panel">
   <div class="ai-head">
@@ -1578,69 +1721,71 @@ window.addHabit = function(){
   toast("Habit added! 💪");
 }
 
+// Replace the old renderHabits and doneHabit functions with these:
+
 function renderHabits(){
   const list = document.getElementById("habitList");
   if(!list) return;
   const today = new Date().toDateString();
   list.innerHTML="";
+  
+  if (habits.length === 0) {
+      list.innerHTML = `<div style="text-align:center; padding: 20px; color: var(--sub); font-size: 14px; font-style: italic;">No habits yet. Create one below!</div>`;
+      return;
+  }
+
   habits.forEach((h,i)=>{
+    // Check if today is in the dates array
+    const isCompletedToday = h.dates && h.dates.includes(today);
+    h.done = isCompletedToday; // Auto-sync state
+
     const li = document.createElement("li");
-    li.className = "task-item";
+    li.className = `habit-card ${isCompletedToday ? 'completed' : ''}`;
     li.innerHTML = `
-      <div style="display:flex;align-items:center;gap:10px;flex:1;">
-        <span style="font-size:22px;">${h.emoji}</span>
-        <div>
-          <strong style="font-size:14px;">${h.name}</strong>
-          <div class="habit-dots">${[...Array(7)].map((_,d)=>{
-            const dd=new Date(); dd.setDate(dd.getDate()-6+d);
-            const filled = h.dates && h.dates.includes(dd.toDateString());
-            const isToday = dd.toDateString()===today;
-            return `<div class="dot${filled?" filled":""}${isToday?" today":""}"></div>`;
-          }).join("")}</div>
-          <small class="time">🔥 ${h.streak} day streak</small>
-        </div>
+      <div class="habit-icon-wrap">${h.emoji}</div>
+      <div class="habit-info">
+        <div class="habit-title">${h.name}</div>
+        <div class="habit-streak">🔥 ${h.streak} Day Streak</div>
       </div>
-      <div style="display:flex;gap:6px;align-items:center;">
-        ${h.done ? `<span style="color:var(--green);font-weight:800;font-size:12px;">✓ Done</span>` 
-                 : `<button class="btn btn-sm btn-green" onclick="doneHabit(${i})">Done</button>`}
-        <button class="btn btn-xs btn-outline btn-red" onclick="deleteHabit(${i})" style="border-color:var(--secondary);color:var(--secondary);">✕</button>
+      <div class="habit-check" onclick="toggleHabit(${i})">
+        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
       </div>
+      <button class="habit-delete" onclick="deleteHabit(${i})" title="Delete Habit">✕</button>
     `;
     list.appendChild(li);
   });
-  renderStreakDots();
 }
 
-window.doneHabit = function(i){
+// New Toggle Logic (replaces doneHabit)
+window.toggleHabit = function(i){
   const today = new Date().toDateString();
-  if(!habits[i].done){
-    habits[i].done = true;
-    if(!habits[i].dates) habits[i].dates=[];
+  if(!habits[i].dates) habits[i].dates=[];
+  
+  const dateIndex = habits[i].dates.indexOf(today);
+  
+  if(dateIndex === -1) {
+    // Habit was NOT done today -> Mark as Complete
     habits[i].dates.push(today);
+    habits[i].done = true;
     habits[i].streak++;
     stats.habitsCompleted++;
     addXP(10);
-    save(); renderHabits();
     toast(`${habits[i].emoji} Habit complete! +10 XP`);
+  } else {
+    // Habit WAS done today -> Undo it
+    habits[i].dates.splice(dateIndex, 1);
+    habits[i].done = false;
+    habits[i].streak = Math.max(0, habits[i].streak - 1);
+    stats.habitsCompleted = Math.max(0, stats.habitsCompleted - 1);
+    stats.xp = Math.max(0, (stats.xp || 0) - 10); // Deduct the XP
+    updateXP();
   }
+  
+  save(); 
+  renderHabits();
 }
 window.deleteHabit = function(i){ habits.splice(i,1); save(); renderHabits(); }
 
-function renderStreakDots(){
-  const el = document.getElementById("streakDots");
-  if(!el) return;
-  const days=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
-  const today = new Date();
-  el.innerHTML = `<div style="display:flex;gap:8px;">` +
-    [...Array(7)].map((_,d)=>{
-      const dd=new Date(); dd.setDate(today.getDate()-6+d);
-      const dayDone = habits.some(h=>h.dates && h.dates.includes(dd.toDateString()));
-      return `<div style="text-align:center;flex:1;">
-        <div class="dot${dayDone?" filled":""}${d===6?" today":""}" style="width:24px;height:24px;border-radius:8px;margin:0 auto;font-size:11px;display:flex;align-items:center;justify-content:center;">${dayDone?"✓":""}</div>
-        <div style="font-size:10px;color:var(--sub);font-weight:700;margin-top:4px;">${days[dd.getDay()]}</div>
-      </div>`;
-    }).join("") + `</div>`;
-}
 
 // ── NOTES & QUICK IDEAS ──
 window.setNoteTag = function(tag, el){
@@ -2337,10 +2482,31 @@ window.switchPage = function(page, btn, dir=0){
       }
   }
 }
+document.addEventListener("touchstart", e => {
+    // Notice we added ".game-board" to the ignore list below!
+    if(e.target.closest(".nav, .ai-panel, .game-board") || e.target.tagName==="INPUT" || e.target.tagName==="TEXTAREA" || e.target.tagName==="SELECT") return;
+    tSX = e.changedTouches[0].screenX;
+    tSY = e.changedTouches[0].screenY;
+}, {passive: true});
 
-let tSX=0,tSY=0,tEX=0,tEY=0;
-document.addEventListener("touchstart",e=>{if(e.target.closest(".nav,.ai-panel")||e.target.tagName==="INPUT"||e.target.tagName==="TEXTAREA"||e.target.tagName==="SELECT")return;tSX=e.changedTouches[0].screenX;tSY=e.changedTouches[0].screenY;},{passive:true});
-document.addEventListener("touchend",e=>{if(e.target.closest(".nav,.ai-panel")||e.target.tagName==="INPUT"||e.target.tagName==="TEXTAREA"||e.target.tagName==="SELECT")return;tEX=e.changedTouches[0].screenX;tEY=e.changedTouches[0].screenY;const dx=tSX-tEX,dy=tSY-tEY;if(Math.abs(dx)>Math.abs(dy)&&Math.abs(dx)>50){const cur=document.querySelector(".page.active");if(!cur)return;let ci=pagesOrder.indexOf(cur.id);let ni=ci+(dx>0?1:-1);if(ni>=0&&ni<pagesOrder.length){const btn=document.querySelectorAll(".nav button")[ni];switchPage(pagesOrder[ni],btn,dx>0?1:-1);}}},{passive:true});
+document.addEventListener("touchend", e => {
+    // And added it here too.
+    if(e.target.closest(".nav, .ai-panel, .game-board") || e.target.tagName==="INPUT" || e.target.tagName==="TEXTAREA" || e.target.tagName==="SELECT") return;
+    tEX = e.changedTouches[0].screenX;
+    tEY = e.changedTouches[0].screenY;
+    
+    const dx = tSX - tEX, dy = tSY - tEY;
+    if(Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 50) {
+        const cur = document.querySelector(".page.active");
+        if(!cur) return;
+        let ci = pagesOrder.indexOf(cur.id);
+        let ni = ci + (dx > 0 ? 1 : -1);
+        if(ni >= 0 && ni < pagesOrder.length) {
+            const btn = document.querySelectorAll(".nav button")[ni];
+            switchPage(pagesOrder[ni], btn, dx > 0 ? 1 : -1);
+        }
+    }
+}, {passive: true});
 
 // ── MODAL HELPERS ──
 window.openModal = function(content){
@@ -2516,6 +2682,25 @@ window.move2048 = function(e) {
 
     if(oldBoard !== JSON.stringify(board2048)) {
         addRandomTile2048(); draw2048();
+    }
+}
+// ── GLOBAL SEARCH LOGIC ──
+window.handleGlobalSearch = function(e) {
+    if(e.key === 'Enter') {
+        const query = e.target.value.trim();
+        if(query) {
+            // Open the AI panel and send the query
+            const aiPanel = document.getElementById("aiPanel");
+            if (aiPanel.style.display !== "flex") {
+                toggleAI();
+            }
+            document.getElementById("aiInput").value = query;
+            sendAI();
+            
+            // Clear the search bar and remove focus
+            e.target.value = "";
+            e.target.blur();
+        }
     }
 }
 </script>
