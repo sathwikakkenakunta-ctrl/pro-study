@@ -18,15 +18,25 @@
   --shadow: 0 8px 32px rgba(31, 38, 135, 0.1);
   --glass-blur: blur(16px);
 }
-
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent; 
+}
 body {
   margin: 0; font-family: 'Segoe UI', system-ui, sans-serif;
   background: var(--bg-gradient); background-size: 200% 200%;
   animation: gradientShift 15s ease infinite; color: var(--text);
   overflow-x: hidden; min-height: 100vh; display: flex; align-items: center; justify-content: center;
   backface-visibility: hidden; -webkit-font-smoothing: antialiased;
+  -webkit-user-select: none;
+  user-select: none;
 }
-
+#chat, #notesPage, input, textarea {
+  -webkit-user-select: text;
+  user-select: text;
+}
 @keyframes gradientShift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
 
 .container { width: 100%; max-width: 400px; padding: 20px; }
@@ -80,14 +90,94 @@ input:focus { outline: none; border-color: var(--primary); background: transpare
   0%,100%{transform:scale(1)} 
   50%{transform:scale(1.05) rotate(-3deg)} 
 }
+/* ─── SPLASH SCREEN (DYNAMIC & PROFESSIONAL) ─── */
+#splashScreen {
+  position: fixed; 
+  top: 0; left: 0; width: 100%; height: 100%;
+  /* Use the app's dynamic moving background */
+  background: var(--bg); 
+  background-size: 300% 300%;
+  animation: bgShift 18s ease infinite; 
+  /* Use the app's dynamic text color */
+  color: var(--text); 
+  z-index: 999999; 
+  display: flex; flex-direction: column;
+  transition: opacity 0.8s ease, visibility 0.8s;
+  opacity: 1; visibility: visible;
+}
+
+.splash-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1; 
+  animation: subtleFadeIn 1.2s ease-out forwards;
+}
+
+.splash-icon {
+  font-size: 54px;
+  margin-bottom: 16px;
+  /* A subtle shadow that matches the app's aesthetic */
+  filter: drop-shadow(0 4px 16px rgba(108,99,255,0.3)); 
+}
+
+.splash-title {
+  font-size: 28px;
+  font-weight: 900; /* Matches your h2 tags */
+  letter-spacing: -0.5px;
+  margin-bottom: 6px;
+  font-family: var(--font);
+}
+
+.splash-tagline {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--sub); /* Hooks into your dynamic sub-text color */
+  margin-bottom: 32px;
+}
+
+.splash-loading {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--primary); /* Uses your primary accent color (Purple/Indigo) */
+  animation: subtleBlink 1.5s infinite;
+}
+
+.splash-credit {
+  text-align: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--sub);
+  padding-bottom: 30px;
+  letter-spacing: 0.5px;
+  animation: subtleFadeIn 1.5s ease-out forwards;
+}
+
+/* Smooth, professional animations */
+@keyframes subtleFadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes subtleBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
 </style>
 </head>
 
 <body>
 <div id="splashScreen">
-  <div class="splash-logo">📖</div>
-  <div class="splash-version">v1.5.0 • Pro Dashboard</div>
-  <div style="font-weight: 900; font-size: 14px; color: var(--primary); margin-top: 20px; font-family: 'Outfit', sans-serif;">Sathwik Akkenakunta</div>
+  <div class="splash-content">
+    <div class="splash-icon">📖</div>
+    <h1 class="splash-title">Student Planner Pro</h1>
+    <p class="splash-tagline">Your Daily Study Companion</p>
+    <div class="splash-loading">Loading...</div>
+  </div>
+  <div class="splash-credit">Developed by Sathwik</div>
 </div>
 <div class="container">
   <div style="text-align: center; margin-bottom: 25px;">
