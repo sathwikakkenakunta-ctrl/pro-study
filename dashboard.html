@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pro Dashboard ✦</title>
+<title>Pro Dashboard 📖</title>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
@@ -58,19 +58,65 @@ body {
   font-size: var(--base-size);
 }
 
-.zen-mode .nav, .zen-mode .top-bar, .zen-mode .card:not(.focus-card), .zen-mode h2 { display: none !important; }
-.zen-mode .focus-card { transform: scale(1.1); margin-top: 15vh; border:none; box-shadow: 0 20px 50px rgba(0,0,0,0.3); background: var(--card);}
-.zen-mode body { background: #000; animation: none; }
+/* ─── RANK BADGE & ANIMATIONS ─── */
+.rank-crown { font-size:64px; text-align:center; display:block; filter:drop-shadow(0 4px 16px rgba(255,200,0,0.5)); animation:pulse 2s ease-in-out infinite; }
+@keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.05) rotate(-3deg)} }
+
+/* ─── SPLASH SCREEN (NEW LAYER) ─── */
+#splashScreen {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: var(--bg); background-size: 300% 300%;
+  z-index: 999999; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  transition: opacity 0.8s ease, visibility 0.8s;
+  opacity: 1; visibility: visible;
+}
+.splash-logo {
+  font-size: 80px; margin-bottom: 20px;
+  filter: drop-shadow(0 4px 16px rgba(255,200,0,0.5));
+  animation: pulse 2s ease-in-out infinite;
+}
+.splash-version { position: absolute; bottom: 40px; font-weight: 800; font-size: 12px; color: var(--sub); letter-spacing: 2px; text-transform: uppercase; }
+
+/* ─── ZEN MODE FIXED SELECTORS & ENHANCED STYLING ─── */
+body.zen-mode .nav, 
+body.zen-mode .top-bar, 
+body.zen-mode .card:not(.focus-card), 
+body.zen-mode h2, 
+body.zen-mode .settings-toggle,
+body.zen-mode .ai-btn,
+body.zen-mode .zen-hide { display: none !important; }
+
+body.zen-mode .focus-card { 
+  transform: scale(1.15) !important; 
+  margin-top: 25vh !important; 
+  border: 1px solid rgba(108,99,255,0.3) !important; 
+  box-shadow: 0 20px 80px rgba(0,0,0,0.8), 0 0 40px rgba(108,99,255,0.2) !important; 
+  background: rgba(10,10,25,0.95) !important;
+  z-index: 9999;
+  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+body.zen-mode #focusTimer {
+  text-shadow: 0 0 30px rgba(108,99,255,0.6);
+  transform: scale(1.05);
+  transition: all 0.4s ease;
+}
+body.zen-mode { background: #000 !important; animation: none !important; }
+
+.exit-zen-btn { display: none !important; }
+body.zen-mode .exit-zen-btn { display: block !important; }
 
 @keyframes bgShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
 
 .container { max-width:430px; margin:auto; padding:20px 14px 150px; position:relative; }
 
-/* ─── TOP BAR (SETTINGS ICON ON LEFT) ─── */
+/* ─── TOP BAR (SPANNING FULL WIDTH FOR SETTINGS & MINI-GAMES) ─── */
 .top-bar {
-  position:fixed; top:16px; left:16px; z-index:200;
-  display:flex; align-items:center;
+  position:fixed; top:16px; left:16px; width: calc(100% - 32px); z-index:200;
+  display:flex; align-items:center; justify-content: space-between;
+  pointer-events: none; 
 }
+.top-bar > * { pointer-events: auto; } 
 .settings-toggle {
   width:42px; height:42px; border-radius:50%;
   border:1px solid var(--card-border);
@@ -81,6 +127,7 @@ body {
 }
 .settings-toggle:hover{transform:rotate(45deg) scale(1.1);}
 .settings-toggle svg{stroke:var(--text); transition:stroke 0.2s; width:22px; height:22px; fill:none;}
+#miniGamesBtn:hover, #closeSettingsBtn:hover { transform: scale(1.1); }
 
 /* ─── CARDS ─── */
 .card { background:var(--card); backdrop-filter:var(--blur); -webkit-backdrop-filter:var(--blur); border:1px solid var(--card-border); padding:20px; border-radius:22px; margin-top:16px; box-shadow:var(--shadow); transition:transform 0.3s, box-shadow 0.3s, background 0.2s; }
@@ -207,10 +254,6 @@ select option{background:var(--card); color:var(--text);}
 .tag{padding:4px 12px;border-radius:50px;font-size:11px;font-weight:700;cursor:pointer;transition:0.2s;}
 .tag.active-tag{color:#fff;}
 
-/* ─── RANK BADGE ─── */
-.rank-crown{font-size:64px;text-align:center;display:block;filter:drop-shadow(0 4px 16px rgba(255,200,0,0.5));animation:pulse 2s ease-in-out infinite;}
-@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05) rotate(-3deg)}}
-
 /* ─── TOGGLES & CHIPS ─── */
 .task-toggle{display:flex;gap:4px;margin-top:14px;background:rgba(0,0,0,0.05);padding:5px;border-radius:18px;position:relative;}
 .dark .task-toggle{background:rgba(255,255,255,0.05);}
@@ -274,16 +317,22 @@ select option{background:var(--card); color:var(--text);}
 ::-webkit-scrollbar-thumb{background:var(--card-border);border-radius:4px;}
 
 /* ─── INTRO CARD OVERLAY ─── */
-#introOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 5000; background: var(--bg); display: flex; align-items: center; justify-content: center; padding: 20px; transition: opacity 0.6s ease; }
+#introOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 5000; background: var(--bg); display: none; align-items: center; justify-content: center; padding: 20px; transition: opacity 0.6s ease; }
 .intro-card { background: var(--card); backdrop-filter: var(--blur); border: 1px solid var(--card-border); padding: 40px 30px; border-radius: 32px; box-shadow: var(--shadow); text-align: center; max-width: 360px; animation: scaleIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); }
 @keyframes scaleIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 </style>
 </head>
 <body>
 
+<div id="splashScreen">
+  <div class="splash-logo">📖</div>
+  <div class="splash-version">v1.5.0 • Pro Dashboard</div>
+  <div style="font-weight: 900; font-size: 14px; color: var(--primary); margin-top: 20px;">Sathwik Akkenakunta</div>
+</div>
+
 <div id="introOverlay">
   <div class="intro-card">
-    <div style="font-size: 50px; margin-bottom: 15px;">✦</div>
+    <div style="font-size: 60px; margin-bottom: 15px; filter:drop-shadow(0 4px 16px rgba(255,200,0,0.5)); animation: pulse 2s ease-in-out infinite;">📖</div>
     <h1 style="font-weight: 900; margin-bottom: 10px;">Welcome to Pro Dashboard</h1>
     <p style="color: var(--sub); font-size: 14px; line-height: 1.6; margin-bottom: 30px;">
       Your all-in-one workspace for deep focus, task tracking, and study rooms. Ready to level up your productivity?
@@ -296,12 +345,26 @@ select option{background:var(--card); color:var(--text);}
 </div>
 
 <div class="top-bar">
-  <button class="settings-toggle" onclick="toggleSettings()">
+  <button class="settings-toggle" id="mainSettingsBtn" onclick="toggleSettings()">
     <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       <circle cx="12" cy="12" r="3"></circle>
       <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
     </svg>
   </button>
+  <div style="display:flex; gap:10px;">
+    <button class="settings-toggle" id="miniGamesBtn" onclick="openMiniGames()" style="display:flex;">
+      <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:22px; height:22px; stroke:var(--text); fill:none;">
+        <rect x="2" y="6" width="20" height="12" rx="2" ry="2"></rect>
+        <circle cx="16" cy="12" r="1"></circle>
+        <circle cx="19" cy="12" r="1"></circle>
+        <line x1="6" y1="12" x2="10" y2="12"></line>
+        <line x1="8" y1="10" x2="8" y2="14"></line>
+      </svg>
+    </button>
+    <button class="settings-toggle" id="closeSettingsBtn" onclick="toggleSettings()" style="display:none; color: var(--text); font-weight: 900; font-size: 18px;">
+      ✕
+    </button>
+  </div>
 </div>
 
 <div class="container">
@@ -317,32 +380,32 @@ select option{background:var(--card); color:var(--text);}
 <div id="homePage" class="page active">
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;margin-top:60px;">
     <div>
-      <h2 id="greeting" style="font-size:22px;">Good Morning ✦</h2>
+      <h2 id="greeting" style="font-size:22px;">Good Morning 📖</h2>
       <div class="sub" id="dateStr"></div>
     </div>
     <div style="text-align:right;">
       <div id="clock" style="font-size:22px;font-weight:900;font-family:var(--mono);color:var(--primary);"></div>
-      <div class="sub">Live</div>
+      <div class="sub" data-i18n="live">Live</div>
     </div>
   </div>
 
   <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:16px;">
     <div class="card" style="padding:14px;text-align:center;margin-top:0;">
       <div style="font-size:24px;font-weight:900;color:var(--primary)" id="homeTaskCount">0</div>
-      <div class="sub">Tasks</div>
+      <div class="sub" data-i18n="tasks">Tasks</div>
     </div>
     <div class="card" style="padding:14px;text-align:center;margin-top:0;">
       <div style="font-size:24px;font-weight:900;color:var(--green)" id="homePomo">0</div>
-      <div class="sub">Pomos</div>
+      <div class="sub" data-i18n="pomos">Pomos</div>
     </div>
     <div class="card" style="padding:14px;text-align:center;margin-top:0;">
       <div style="font-size:24px;font-weight:900;color:var(--secondary)" id="homeStreak">0🔥</div>
-      <div class="sub">Streak</div>
+      <div class="sub" data-i18n="streak">Streak</div>
     </div>
   </div>
 
   <div class="card" style="text-align:center;">
-    <div class="sub">Daily Progress</div>
+    <div class="sub" data-i18n="daily_prog">Daily Progress</div>
     <div class="ring-box">
       <svg width="150" height="150" viewBox="0 0 130 130">
         <circle cx="65" cy="65" r="55" class="ring-bg"/>
@@ -350,11 +413,11 @@ select option{background:var(--card); color:var(--text);}
       </svg>
       <div class="ring-text" id="progress" style="color:var(--secondary);">0%</div>
     </div>
-    <div id="homeMotivation" class="affirmation">Let's crush it today! 🚀</div>
+    <div id="homeMotivation" class="affirmation" data-i18n="crush_it">Let's crush it today! 🚀</div>
   </div>
 
   <div class="card">
-    <div class="sub">Today's Mood</div>
+    <div class="sub" data-i18n="todays_mood">Today's Mood</div>
     <div class="mood-grid" id="moodGrid">
       <button class="mood-btn" onclick="setMood(this,'😤','Grumpy')">😤</button>
       <button class="mood-btn" onclick="setMood(this,'😐','Neutral')">😐</button>
@@ -366,7 +429,7 @@ select option{background:var(--card); color:var(--text);}
   </div>
 
   <div class="card">
-    <div class="sub">Calendar</div>
+    <div class="sub" data-i18n="calendar">Calendar</div>
     <div class="cal-header" style="margin-top:10px; display:flex; justify-content:space-between; align-items:center;">
       <button onclick="calNav(-1)" class="btn btn-xs btn-outline">‹</button>
       <div style="display:flex; gap:5px;">
@@ -387,8 +450,8 @@ select option{background:var(--card); color:var(--text);}
     <div class="cal-grid" id="calGrid"></div>
   </div>
 
-  <div class="card">
-    <div class="sub" id="timerLabel" style="text-align:center;">Focus Session</div>
+  <div class="card focus-card">
+    <div class="sub" id="timerLabel" style="text-align:center;" data-i18n="focus_session">Focus Session</div>
     <div class="mode-badge mode-work" id="modeBadge">🎯 Work Mode</div>
     <div style="margin:18px 0 10px;">
       <div id="timer" style="margin:0 auto;width:fit-content;">25:00</div>
@@ -403,10 +466,11 @@ select option{background:var(--card); color:var(--text);}
       <button class="btn btn-green" style="flex:1;display:none;" id="resumeBtn" onclick="resumeTimer()">▶ Resume</button>
       <button class="btn btn-outline" style="flex:1;" onclick="resetTimer()">↺ Reset</button>
     </div>
+    <button class="btn btn-outline exit-zen-btn" style="width:100%; margin-top:12px;" onclick="toggleZenMode()" data-i18n="exit_zen">✕ Exit Zen Mode</button>
   </div>
 
   <div class="card" style="cursor:pointer;" onclick="switchPage('taskPage',document.querySelectorAll('.nav button')[1])">
-    <div class="sub">Latest Task</div>
+    <div class="sub" data-i18n="latest_task">Latest Task</div>
     <div id="latestTask" style="font-size:17px;font-weight:700;margin-top:6px;">None — add a task →</div>
     <div class="bar-track" style="margin-top:14px;">
       <div class="bar-fill" id="homeProgress" style="width:0%"></div>
@@ -415,10 +479,10 @@ select option{background:var(--card); color:var(--text);}
   </div>
 
   <div class="card" style="text-align:center;">
-    <div class="sub">Daily Affirmation</div>
+    <div class="sub" data-i18n="daily_affirm">Daily Affirmation</div>
     <div id="affirmText" class="affirmation" style="font-size:16px;margin:14px 0;"></div>
     <div style="display:flex; gap:10px; justify-content:center;">
-      <button class="btn btn-sm btn-outline" onclick="newAffirmation()">✦ New Affirmation</button>
+      <button class="btn btn-sm btn-outline" onclick="newAffirmation()">📖 New Affirmation</button>
       <button class="btn btn-sm" onclick="generateMorningBrief()">☀️ Briefing</button>
     </div>
   </div>
@@ -426,8 +490,8 @@ select option{background:var(--card); color:var(--text);}
 
 <div id="settingsPage" class="page">
   <div style="margin-top:60px;">
-    <h2>App Settings</h2>
-    <div class="sub">Customize your experience</div>
+    <h2 data-i18n="settings_title">App Settings</h2>
+    <div class="sub" data-i18n="customize">Customize your experience</div>
   </div>
 
   <div class="card">
@@ -438,25 +502,26 @@ select option{background:var(--card); color:var(--text);}
     </div>
 
     <div class="settings-group" style="margin-top:20px;">
-      <span class="settings-label">Appearance</span>
+      <span class="settings-label" data-i18n="appearance">Appearance</span>
       <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(0,0,0,0.03); padding:12px; border-radius:12px; border:1px solid var(--card-border);">
-        <div style="font-size:14px; font-weight:700;">Dark Mode</div>
+        <div style="font-size:14px; font-weight:700;" data-i18n="dark_mode">Dark Mode</div>
         <button class="btn btn-xs btn-outline" onclick="toggleMode()" id="modeBtn">Toggle</button>
       </div>
     </div>
 
     <div class="settings-group">
-      <span class="settings-label">Language</span>
-      <select id="langSelect" onchange="toast('Language preference saved!')">
+      <span class="settings-label" data-i18n="language">Language</span>
+      <select id="langSelect" onchange="applyLanguage()">
         <option value="en">English</option>
         <option value="es">Español</option>
         <option value="hi">हिन्दी</option>
         <option value="fr">Français</option>
+        <option value="te">తెలుగు</option>
       </select>
     </div>
 
     <div class="settings-group">
-      <span class="settings-label">Typography Studio</span>
+      <span class="settings-label" data-i18n="typo_studio">Typography Studio</span>
       <div style="background:rgba(0,0,0,0.03); padding:15px; border-radius:12px; border:1px solid var(--card-border);">
         <div style="margin-bottom:15px;">
           <label style="font-size:12px; color:var(--sub); font-weight:700; display:block; margin-bottom:6px;">Font Family</label>
@@ -477,7 +542,7 @@ select option{background:var(--card); color:var(--text);}
     </div>
 
     <div class="settings-group">
-      <span class="settings-label">UI Colors (Accent)</span>
+      <span class="settings-label" data-i18n="ui_colors">UI Colors (Accent)</span>
       <div class="color-picker-grid">
         <div class="color-circle active" style="background:#6c63ff;" onclick="setThemeColor('#6c63ff', this)"></div>
         <div class="color-circle" style="background:#f72585;" onclick="setThemeColor('#f72585', this)"></div>
@@ -488,7 +553,7 @@ select option{background:var(--card); color:var(--text);}
     </div>
 
     <div class="settings-group" style="padding-top:10px;">
-      <button class="btn btn-red" style="width:100%;" onclick="logout()">Log Out of Dashboard</button>
+      <button class="btn btn-red" style="width:100%;" onclick="logout()" data-i18n="logout">Log Out of Dashboard</button>
     </div>
   </div>
 
@@ -498,36 +563,31 @@ select option{background:var(--card); color:var(--text);}
       <strong>Version:</strong> v1.5.0 (Global Settings Update)<br>
       <strong>Status:</strong> Live & Cloud Synced<br><br>
       <strong>Development Team:</strong><br>
-<div style="display:flex; align-items:center; gap:8px; margin-top:8px;">
-  <div style="width:24px; height:24px; border-radius:50%; background:var(--primary); color:#fff; display:flex; justify-content:center; align-items:center; font-size:12px; font-weight:bold;">S</div>
-  <span>Sathwik Akkenakunta— <span style="color:var(--primary); font-weight:800;">Founder & Lead Architect</span></span>
-</div>
-<div style="display:flex; align-items:center; gap:8px; margin-top:8px;">
-  <div style="width:24px; height:24px; border-radius:50%; background:var(--accent); color:#fff; display:flex; justify-content:center; align-items:center; font-size:12px; font-weight:bold;">V</div>
-  <span>Vishwas Akkenakunta — <span style="color:var(--accent); font-weight:800;">Co-Creator(Ideas & Testing)</span></span>
-</div>
-<div style="display:flex; align-items:center; gap:8px; margin-top:8px;">
-  <div style="width:24px; height:24px; border-radius:50%; background:var(--secondary); color:#fff; display:flex; justify-content:center; align-items:center; font-size:12px; font-weight:bold;">G</div>
-  <span>Gemini AI, Firebase & CloudFlare — <span style="color:var(--secondary); font-weight:800;">Code Collaborator</span></span>
-</div>
-
+      <div style="display:flex; align-items:center; gap:8px; margin-top:8px;">
+        <div style="width:24px; height:24px; border-radius:50%; background:var(--primary); color:#fff; display:flex; justify-content:center; align-items:center; font-size:12px; font-weight:bold;">S</div>
+        <span>Sathwik Akkenakunta— <span style="color:var(--primary); font-weight:800;">Founder & Lead Architect</span></span>
+      </div>
+      <div style="display:flex; align-items:center; gap:8px; margin-top:8px;">
+        <div style="width:24px; height:24px; border-radius:50%; background:var(--accent); color:#fff; display:flex; justify-content:center; align-items:center; font-size:12px; font-weight:bold;">V</div>
+        <span>Vishwas Akkenakunta — <span style="color:var(--accent); font-weight:800;">Co-Creator(Ideas & Testing)</span></span>
+      </div>
     </div>
   </div>
 </div>
 
 <div id="taskPage" class="page">
-  <div style="margin-top:60px;"><h2>Task Board</h2></div>
+  <div style="margin-top:60px;"><h2 data-i18n="task_board">Task Board</h2></div>
 
   <div class="card">
     <input id="taskInput" placeholder="What needs to be done?" style="margin-bottom:10px;">
     <div style="display:flex;gap:8px;">
       <div class="time-field">
         <input type="time" id="start" placeholder=" ">
-        <label for="start">Start Time</label>
+        <label for="start" data-i18n="start_time">Start Time</label>
       </div>
       <div class="time-field">
         <input type="time" id="end" placeholder=" ">
-        <label for="end">End Time</label>
+        <label for="end" data-i18n="end_time">End Time</label>
       </div>
     </div>
     <div class="chip-row" id="prioChips">
@@ -535,7 +595,7 @@ select option{background:var(--card); color:var(--text);}
       <div class="chip med" onclick="setPrio('med',this)" id="pMed">🟠 Medium</div>
       <div class="chip low" onclick="setPrio('low',this)" id="pLow">🟢 Low</div>
     </div>
-    <button class="btn" style="width:100%;margin-top:12px;" onclick="addTask()">＋ Add Task</button>
+    <button class="btn" style="width:100%;margin-top:12px;" onclick="addTask()" data-i18n="add_task">＋ Add Task</button>
   </div>
 
   <div style="margin-top:12px;position:relative;">
@@ -544,8 +604,8 @@ select option{background:var(--card); color:var(--text);}
 
   <div class="task-toggle">
     <div class="toggle-ind"></div>
-    <button id="activeBtn" class="active" onclick="showActive()">Active</button>
-    <button id="completedBtn" onclick="showCompleted()">Completed</button>
+    <button id="activeBtn" class="active" onclick="showActive()" data-i18n="active">Active</button>
+    <button id="completedBtn" onclick="showCompleted()" data-i18n="completed">Completed</button>
   </div>
 
   <ul id="taskList" style="padding:0;list-style:none;"></ul>
@@ -553,9 +613,9 @@ select option{background:var(--card); color:var(--text);}
 </div>
 
 <div id="focusPage" class="page">
-  <div style="display:flex; justify-content:space-between; align-items:center; margin-top:60px;">
-    <h2>Focus Flow</h2>
-    <button class="btn btn-xs btn-outline" onclick="toggleZenMode()">🧘 Zen Mode</button>
+  <div class="zen-hide" style="display:flex; justify-content:space-between; align-items:center; margin-top:60px;">
+    <h2 data-i18n="focus_flow">Focus Flow</h2>
+    <button class="btn btn-xs btn-outline" onclick="toggleZenMode()" data-i18n="zen_mode">🧘 Zen Mode</button>
   </div>
 
   <div class="card" style="padding:16px;">
@@ -572,8 +632,8 @@ select option{background:var(--card); color:var(--text);}
     </div>
   </div>
 
-  <div class="card" style="text-align:center;">
-    <div class="sub">Pomodoro Sessions</div>
+  <div class="card focus-card" style="text-align:center;">
+    <div class="sub" data-i18n="focus_session">Pomodoro Sessions</div>
     <div style="font-size:72px;font-weight:900;font-family:var(--mono);color:var(--primary);margin:12px 0 4px;" id="focusTimer">25:00</div>
     <div class="mode-badge mode-work" id="focusModeBadge">🎯 Work Mode</div>
     <div style="display:flex;justify-content:center;gap:10px;margin-top:16px;">
@@ -584,6 +644,7 @@ select option{background:var(--card); color:var(--text);}
     <div style="margin-top:16px;display:flex;justify-content:center;gap:8px;">
       <span class="stat-badge">🍅 <span id="focusPomos">0</span> Today</span>
     </div>
+    <button class="btn btn-outline exit-zen-btn" style="width:100%; margin-top:15px;" onclick="toggleZenMode()" data-i18n="exit_zen">✕ Exit Zen Mode</button>
   </div>
 
   <div class="card">
@@ -596,7 +657,7 @@ select option{background:var(--card); color:var(--text);}
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px;">
       <div style="text-align:center;">
         <div style="font-size:28px;font-weight:900;color:var(--primary);font-family:var(--mono);" id="totalPomos">0</div>
-        <div class="sub">Total Pomos</div>
+        <div class="sub" data-i18n="pomos">Total Pomos</div>
       </div>
       <div style="text-align:center;">
         <div style="font-size:28px;font-weight:900;color:var(--green);font-family:var(--mono);" id="focusHours">0h</div>
@@ -611,17 +672,17 @@ select option{background:var(--card); color:var(--text);}
 </div>
 
 <div id="roomPage" class="page">
-  <div style="margin-top:60px;"><h2>Cloud Study Rooms</h2></div>
+  <div style="margin-top:60px;"><h2 data-i18n="study_rooms">Cloud Study Rooms</h2></div>
 
   <div class="card" id="joinRoomCard">
-    <div class="sub">Room Hub</div>
+    <div class="sub" data-i18n="room_hub">Room Hub</div>
     <div style="font-size: 13px; margin: 10px 0; color: var(--sub);">Search, join, or create a live study room.</div>
     <input type="text" id="roomCodeInput" placeholder="Search or Enter Room Code" style="text-transform: uppercase;">
     <input type="hidden" id="playerNameInput" placeholder="Your Name" style="margin-top:10px;">
 
     <div style="display:flex; gap:10px; margin-top:15px;">
-      <button class="btn" onclick="joinRoom()" style="flex:1;">Join / Search</button>
-      <button class="btn btn-outline" onclick="createRoom()" style="flex:1; border-color:var(--secondary); color:var(--secondary);">Create New</button>
+      <button class="btn" onclick="joinRoom()" style="flex:1;" data-i18n="join_search">Join / Search</button>
+      <button class="btn btn-outline" onclick="createRoom()" style="flex:1; border-color:var(--secondary); color:var(--secondary);" data-i18n="create_new">Create New</button>
     </div>
   </div>
 
@@ -670,7 +731,7 @@ select option{background:var(--card); color:var(--text);}
 </div>
 
 <div id="habitPage" class="page">
-  <div style="margin-top:60px;"><h2>Habit Forge</h2></div>
+  <div style="margin-top:60px;"><h2 data-i18n="habit_forge">Habit Forge</h2></div>
 
   <div class="card">
     <div class="sub">Add Habit</div>
@@ -681,12 +742,12 @@ select option{background:var(--card); color:var(--text);}
         <option>🏃</option><option>🍎</option><option>✍️</option><option>😴</option>
       </select>
     </div>
-    <button class="btn" style="width:100%;margin-top:10px;" onclick="addHabit()">＋ Add Habit</button>
+    <button class="btn" style="width:100%;margin-top:10px;" onclick="addHabit()" data-i18n="add_habit">＋ Add Habit</button>
   </div>
 
   <div class="card">
     <div style="display:flex;justify-content:space-between;align-items:center;">
-      <div class="sub">Hydration Tracker</div>
+      <div class="sub" data-i18n="hydration">Hydration Tracker</div>
       <div style="font-weight:900;color:var(--accent);font-family:var(--mono);" id="waterCount">0/8 💧</div>
     </div>
     <div class="water-cups" id="waterCups"></div>
@@ -696,7 +757,7 @@ select option{background:var(--card); color:var(--text);}
   </div>
 
   <div class="card">
-    <div class="sub">Daily Habits</div>
+    <div class="sub" data-i18n="daily_habits">Daily Habits</div>
     <ul id="habitList" style="padding:0;list-style:none;margin-top:8px;"></ul>
   </div>
 
@@ -707,7 +768,7 @@ select option{background:var(--card); color:var(--text);}
 </div>
 
 <div id="notesPage" class="page">
-  <div style="margin-top:60px;"><h2>Mind Dump</h2></div>
+  <div style="margin-top:60px;"><h2 data-i18n="mind_dump">Mind Dump</h2></div>
 
   <div class="card">
     <input id="noteTitleInput" placeholder="Note title..." style="margin-bottom:10px;">
@@ -726,14 +787,14 @@ select option{background:var(--card); color:var(--text);}
 
   <div class="card">
     <div style="display:flex;justify-content:space-between;align-items:center;">
-      <div class="sub">Saved Notes</div>
+      <div class="sub" data-i18n="saved_notes">Saved Notes</div>
       <div style="font-size:12px;color:var(--sub);font-weight:700;" id="noteCount">0 notes</div>
     </div>
     <div class="notes-list" id="notesList"></div>
   </div>
 
   <div class="card">
-    <div class="sub">Quick Ideas</div>
+    <div class="sub" data-i18n="quick_ideas">Quick Ideas</div>
     <div style="display:flex;gap:8px;margin-top:10px;">
       <input id="quickIdeaInput" placeholder="Capture a quick idea...">
       <button class="btn btn-sm" onclick="addQuickIdea()">＋</button>
@@ -743,7 +804,7 @@ select option{background:var(--card); color:var(--text);}
 </div>
 
 <div id="goalPage" class="page">
-  <div style="margin-top:60px;"><h2>Goal Vault</h2></div>
+  <div style="margin-top:60px;"><h2 data-i18n="goal_vault">Goal Vault</h2></div>
 
   <div class="card">
     <div class="sub">Add Goal</div>
@@ -763,7 +824,7 @@ select option{background:var(--card); color:var(--text);}
   <div class="card">
     <div style="display:flex;justify-content:space-between;align-items:center;">
       <div>
-        <div class="sub">Your Level</div>
+        <div class="sub" data-i18n="your_level">Your Level</div>
         <div style="font-size:22px;font-weight:900;" id="levelName">Rookie Scholar</div>
       </div>
       <div style="font-size:40px;" id="levelBadge">📖</div>
@@ -778,21 +839,21 @@ select option{background:var(--card); color:var(--text);}
   </div>
 
   <div class="card">
-    <div class="sub">Goals Timeline</div>
+    <div class="sub" data-i18n="goals_timeline">Goals Timeline</div>
     <div id="goalTimeline" style="margin-top:8px;"></div>
   </div>
 
   <div class="card" style="text-align:center;background:linear-gradient(135deg,rgba(108,99,255,0.1),rgba(247,37,133,0.1));">
-    <div class="sub">Top Priority</div>
-    <div id="topGoal" style="font-size:20px;font-weight:900;margin:10px 0;background:linear-gradient(135deg,var(--primary),var(--secondary));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Become a Top 1% Student ✦</div>
+    <div class="sub" data-i18n="top_priority">Top Priority</div>
+    <div id="topGoal" style="font-size:20px;font-weight:900;margin:10px 0;background:linear-gradient(135deg,var(--primary),var(--secondary));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Become a Top 1% Student 📖</div>
   </div>
 </div>
 
 <div id="leaderPage" class="page">
-  <div style="margin-top:60px;"><h2>Leaderboard</h2></div>
+  <div style="margin-top:60px;"><h2 data-i18n="leaderboard">Leaderboard</h2></div>
 
   <div class="card" style="text-align:center;">
-    <div class="sub">Your Rank</div>
+    <div class="sub" data-i18n="your_rank">Your Rank</div>
     <span class="rank-crown" id="rankCrown">🏆</span>
     <div style="font-size:22px;font-weight:900;margin-top:4px;" id="rankTitle">Pro Scholar</div>
     <div style="color:var(--sub);font-size:13px;margin-top:4px;" id="rankDesc">Complete more tasks to climb higher!</div>
@@ -802,41 +863,41 @@ select option{background:var(--card); color:var(--text);}
   </div>
 
   <div class="card">
-    <div class="sub">Your Stats</div>
+    <div class="sub" data-i18n="your_stats">Your Stats</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px;">
       <div style="background:rgba(108,99,255,0.1);border-radius:14px;padding:14px;text-align:center;">
         <div style="font-size:26px;font-weight:900;color:var(--primary);font-family:var(--mono);" id="lbTasks">0</div>
-        <div class="sub">Tasks Done</div>
+        <div class="sub" data-i18n="tasks">Tasks Done</div>
       </div>
       <div style="background:rgba(247,37,133,0.1);border-radius:14px;padding:14px;text-align:center;">
         <div style="font-size:26px;font-weight:900;color:var(--secondary);font-family:var(--mono);" id="lbPomos">0</div>
-        <div class="sub">Pomodoros</div>
+        <div class="sub" data-i18n="pomos">Pomodoros</div>
       </div>
       <div style="background:rgba(6,214,160,0.1);border-radius:14px;padding:14px;text-align:center;">
         <div style="font-size:26px;font-weight:900;color:var(--green);font-family:var(--mono);" id="lbStreak">0</div>
-        <div class="sub">Day Streak</div>
+        <div class="sub" data-i18n="streak">Day Streak</div>
       </div>
       <div style="background:rgba(76,201,240,0.1);border-radius:14px;padding:14px;text-align:center;">
         <div style="font-size:26px;font-weight:900;color:var(--accent);font-family:var(--mono);" id="lbHabits">0</div>
-        <div class="sub">Habits Done</div>
+        <div class="sub">Habits</div>
       </div>
     </div>
   </div>
 
   <div class="card">
-    <div class="sub">Top Scholars</div>
+    <div class="sub" data-i18n="top_scholars">Top Scholars</div>
     <div id="leaderboardList" style="margin-top:8px;"></div>
   </div>
 
   <div class="card">
-    <div class="sub">Achievements</div>
+    <div class="sub" data-i18n="achievements">Achievements</div>
     <div id="achievements" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;"></div>
   </div>
 
   <div class="card">
-    <div class="sub">Weekly Recap</div>
+    <div class="sub" data-i18n="weekly_recap">Weekly Recap</div>
     <div id="weeklyRecap" style="margin-top:10px;font-size:14px;line-height:1.8;color:var(--sub);">Generate your recap below</div>
-    <button class="btn" onclick="generateWeeklyRecap()" style="width:100%;margin-top:12px;">📊 Generate Recap</button>
+    <button class="btn" onclick="generateWeeklyRecap()" style="width:100%;margin-top:12px;" data-i18n="gen_recap">📊 Generate Recap</button>
   </div>
 </div>
 
@@ -910,21 +971,126 @@ select option{background:var(--card); color:var(--text);}
 <div class="toast" id="toast"></div>
 
 <script>
-// ── INTRO CARD LOGIC ──
-window.closeIntro = function() {
-  const overlay = document.getElementById("introOverlay");
-  if(overlay) {
-    overlay.style.opacity = "0";
-    setTimeout(() => {
-      overlay.style.display = "none";
-      localStorage.setItem("pro_intro_done", "true");
-      // If not logged in, redirect to login page
-      if (!myUserId) {
-        window.location.href = "index.html";
-      }
-    }, 600);
+// ── LOCALIZATION & MULTI-LANGUAGE ENGINE ──
+const i18n = {
+  en: {
+     greeting_m: "Good Morning", greeting_a: "Good Afternoon", greeting_e: "Good Evening", greeting_n: "Good Night",
+     live: "Live", tasks: "Tasks", pomos: "Pomos", streak: "Streak",
+     daily_prog: "Daily Progress", crush_it: "Let's crush it today! 🚀", todays_mood: "Today's Mood",
+     calendar: "Calendar", focus_session: "Focus Session", latest_task: "Latest Task", daily_affirm: "Daily Affirmation",
+     settings_title: "App Settings", customize: "Customize your experience", appearance: "Appearance",
+     dark_mode: "Dark Mode", language: "Language", typo_studio: "Typography Studio", ui_colors: "UI Colors (Accent)",
+     logout: "Log Out of Dashboard", task_board: "Task Board", focus_flow: "Focus Flow",
+     study_rooms: "Cloud Study Rooms", habit_forge: "Habit Forge", mind_dump: "Mind Dump", goal_vault: "Goal Vault",
+     leaderboard: "Leaderboard", start_time: "Start Time", end_time: "End Time", add_task: "＋ Add Task",
+     active: "Active", completed: "Completed", room_hub: "Room Hub", join_search: "Join / Search",
+     create_new: "Create New", add_habit: "＋ Add Habit", hydration: "Hydration Tracker", daily_habits: "Daily Habits",
+     saved_notes: "Saved Notes", quick_ideas: "Quick Ideas", your_level: "Your Level", goals_timeline: "Goals Timeline",
+     top_priority: "Top Priority", your_rank: "Your Rank", your_stats: "Your Stats", top_scholars: "Top Scholars",
+     achievements: "Achievements", weekly_recap: "Weekly Recap", gen_recap: "📊 Generate Recap",
+     zen_mode: "🧘 Zen Mode", exit_zen: "✕ Exit Zen Mode", mini_games: "Mini-Games Coming soon! 🎮",
+     lang_saved: "Language preference saved!"
+  },
+  te: {
+     greeting_m: "శుభోదయం", greeting_a: "శుభాహ్నం", greeting_e: "శుభ సాయంత్రం", greeting_n: "శుభ రాత్రి",
+     live: "లైవ్", tasks: "టాస్క్‌లు", pomos: "పోమోలు", streak: "స్ట్రీక్",
+     daily_prog: "రోజువారీ పురోగతి", crush_it: "ఈ రోజు సాధిద్దాం! 🚀", todays_mood: "ఈ రోజు మూడ్",
+     calendar: "క్యాలెండర్", focus_session: "ఫోకస్ సెషన్", latest_task: "తాజా టాస్క్", daily_affirm: "రోజువారీ ధృవీకరణ",
+     settings_title: "యాప్ సెట్టింగ్‌లు", customize: "మీ అనుభవాన్ని మార్చుకోండి", appearance: "స్వరూపం",
+     dark_mode: "డార్క్ మోడ్", language: "భాష", typo_studio: "టైపోగ్రఫీ స్టూడియో", ui_colors: "UI రంగులు",
+     logout: "లాగౌట్", task_board: "టాస్క్ బోర్డ్", focus_flow: "ఫోకస్ ఫ్లో",
+     study_rooms: "క్లౌడ్ స్టడీ రూమ్స్", habit_forge: "అలవాట్లు", mind_dump: "మైండ్ డంప్", goal_vault: "లక్ష్యాల వాల్ట్",
+     leaderboard: "లీడర్‌బోర్డ్", start_time: "ప్రారంభ సమయం", end_time: "ముగింపు సమయం", add_task: "＋ టాస్క్ జోడించు",
+     active: "క్రియాశీల", completed: "పూర్తయింది", room_hub: "రూమ్ హబ్", join_search: "చేరండి / వెతకండి",
+     create_new: "కొత్తది సృష్టించండి", add_habit: "＋ అలవాటు జోడించు", hydration: "హైడ్రేషన్ ట్రాకర్", daily_habits: "రోజువారీ అలవాట్లు",
+     saved_notes: "సేవ్ చేసిన నోట్స్", quick_ideas: "త్వరిత ఆలోచనలు", your_level: "మీ స్థాయి", goals_timeline: "లక్ష్యాల టైమ్‌లైన్",
+     top_priority: "అత్యంత ప్రాధాన్యత", your_rank: "మీ ర్యాంక్", your_stats: "మీ గణాంకాలు", top_scholars: "టాప్ స్కాలర్స్",
+     achievements: "విజయాలు", weekly_recap: "వీక్లీ రీక్యాప్", gen_recap: "📊 రీక్యాప్ రూపొందించండి",
+     zen_mode: "🧘 జెన్ మోడ్", exit_zen: "✕ జెన్ మోడ్ నుండి నిష్క్రమించండి", mini_games: "మినీ-గేమ్స్ త్వరలో వస్తున్నాయి! 🎮",
+     lang_saved: "భాష సెట్ చేయబడింది!"
+  },
+  es: {
+     greeting_m: "Buenos días", greeting_a: "Buenas tardes", greeting_e: "Buenas noches", greeting_n: "Buenas noches",
+     live: "En vivo", tasks: "Tareas", pomos: "Pomos", streak: "Racha",
+     daily_prog: "Progreso Diario", crush_it: "¡Vamos a lograrlo hoy! 🚀", todays_mood: "Estado de ánimo",
+     calendar: "Calendario", focus_session: "Sesión de Enfoque", latest_task: "Última Tarea", daily_affirm: "Afirmación Diaria",
+     settings_title: "Ajustes de la App", customize: "Personaliza tu experiencia", appearance: "Apariencia",
+     dark_mode: "Modo Oscuro", language: "Idioma", typo_studio: "Estudio Tipográfico", ui_colors: "Colores de UI",
+     logout: "Cerrar sesión", task_board: "Tablero de Tareas", focus_flow: "Flujo de Enfoque",
+     study_rooms: "Salas de Estudio", habit_forge: "Forja de Hábitos", mind_dump: "Descarga Mental", goal_vault: "Bóveda de Metas",
+     leaderboard: "Clasificación", start_time: "Hora de inicio", end_time: "Hora de fin", add_task: "＋ Añadir Tarea",
+     active: "Activo", completed: "Completado", room_hub: "Centro de Salas", join_search: "Unirse / Buscar",
+     create_new: "Crear Nuevo", add_habit: "＋ Añadir Hábito", hydration: "Hidratación", daily_habits: "Hábitos Diarios",
+     saved_notes: "Notas Guardadas", quick_ideas: "Ideas Rápidas", your_level: "Tu Nivel", goals_timeline: "Línea de tiempo",
+     top_priority: "Prioridad Superior", your_rank: "Tu Rango", your_stats: "Tus Estadísticas", top_scholars: "Mejores Estudiantes",
+     achievements: "Logros", weekly_recap: "Resumen Semanal", gen_recap: "📊 Generar Resumen",
+     zen_mode: "🧘 Modo Zen", exit_zen: "✕ Salir del Modo Zen", mini_games: "¡Mini-Juegos pronto! 🎮",
+     lang_saved: "¡Idioma guardado!"
+  },
+  hi: {
+     greeting_m: "सुप्रभात", greeting_a: "शुभ दोपहर", greeting_e: "शुभ संध्या", greeting_n: "शुभ रात्रि",
+     live: "लाइव", tasks: "कार्य", pomos: "पोमो", streak: "सिलसिला",
+     daily_prog: "दैनिक प्रगति", crush_it: "चलो आज कुछ कमाल करते हैं! 🚀", todays_mood: "आज का मूड",
+     calendar: "कैलेंडर", focus_session: "फोकस सत्र", latest_task: "नवीनतम कार्य", daily_affirm: "दैनिक पुष्टि",
+     settings_title: "ऐप सेटिंग्स", customize: "अपने अनुभव को अनुकूलित करें", appearance: "दिखावट",
+     dark_mode: "डार्क मोड", language: "भाषा", typo_studio: "टाइपोग्राफी स्टूडियो", ui_colors: "यूआई रंग",
+     logout: "लॉग आउट", task_board: "टास्क बोर्ड", focus_flow: "फोकस फ्लो",
+     study_rooms: "क्लाउड स्टडी रूम्स", habit_forge: "आदत निर्माण", mind_dump: "माइंड डंप", goal_vault: "लक्ष्य वॉल्ट",
+     leaderboard: "लीडरबोर्ड", start_time: "आरंभ समय", end_time: "समाप्ति समय", add_task: "＋ कार्य जोड़ें",
+     active: "सक्रिय", completed: "पूरा हुआ", room_hub: "रूम हब", join_search: "शामिल हों / खोजें",
+     create_new: "नया बनाएं", add_habit: "＋ आदत जोड़ें", hydration: "हाइड्रेशन", daily_habits: "दैनिक आदतें",
+     saved_notes: "सहेजे गए नोट्स", quick_ideas: "त्वरित विचार", your_level: "आपका स्तर", goals_timeline: "लक्ष्य समयरेखा",
+     top_priority: "सर्वोच्च प्राथमिकता", your_rank: "आपकी रैंक", your_stats: "आपके आंकड़े", top_scholars: "शीर्ष विद्वान",
+     achievements: "उपलब्धियां", weekly_recap: "साप्ताहिक पुनर्कथन", gen_recap: "📊 पुनर्कथन उत्पन्न करें",
+     zen_mode: "🧘 ज़ेन मोड", exit_zen: "✕ ज़ेन मोड से बाहर", mini_games: "मिनी-गेम्स जल्द आ रहे हैं! 🎮",
+     lang_saved: "भाषा सहेजी गई!"
+  },
+  fr: {
+     greeting_m: "Bonjour", greeting_a: "Bon après-midi", greeting_e: "Bonsoir", greeting_n: "Bonne nuit",
+     live: "En direct", tasks: "Tâches", pomos: "Pomos", streak: "Série",
+     daily_prog: "Progrès Quotidien", crush_it: "Allons-y aujourd'hui! 🚀", todays_mood: "Humeur du jour",
+     calendar: "Calendrier", focus_session: "Session de Concentration", latest_task: "Dernière Tâche", daily_affirm: "Affirmation Quotidienne",
+     settings_title: "Paramètres de l'App", customize: "Personnalisez votre expérience", appearance: "Apparence",
+     dark_mode: "Mode Sombre", language: "Langue", typo_studio: "Studio Typographique", ui_colors: "Couleurs de l'UI",
+     logout: "Se déconnecter", task_board: "Tableau des Tâches", focus_flow: "Flux de Concentration",
+     study_rooms: "Salles d'Étude", habit_forge: "Forge d'Habitudes", mind_dump: "Vidage Mental", goal_vault: "Coffre d'Objectifs",
+     leaderboard: "Classement", start_time: "Heure de début", end_time: "Heure de fin", add_task: "＋ Ajouter Tâche",
+     active: "Actif", completed: "Terminé", room_hub: "Centre des Salles", join_search: "Rejoindre / Chercher",
+     create_new: "Créer Nouveau", add_habit: "＋ Ajouter Habitude", hydration: "Suivi d'Hydratation", daily_habits: "Habitudes Quotidiennes",
+     saved_notes: "Notes Enregistrées", quick_ideas: "Idées Rapides", your_level: "Votre Niveau", goals_timeline: "Chronologie",
+     top_priority: "Priorité Absolue", your_rank: "Votre Rang", your_stats: "Vos Statistiques", top_scholars: "Meilleurs Étudiants",
+     achievements: "Réalisations", weekly_recap: "Résumé Hebdomadaire", gen_recap: "📊 Générer Résumé",
+     zen_mode: "🧘 Mode Zen", exit_zen: "✕ Quitter le Mode Zen", mini_games: "Mini-jeux bientôt ! 🎮",
+     lang_saved: "Préférence de langue enregistrée!"
   }
+};
+
+let currentLang = localStorage.getItem("pd_lang") || "en";
+
+window.applyLanguage = function(silent = false) {
+    const langSelect = document.getElementById("langSelect");
+    if(langSelect) {
+        currentLang = langSelect.value;
+        localStorage.setItem("pd_lang", currentLang);
+    }
+    const dict = i18n[currentLang] || i18n["en"];
+
+    document.querySelectorAll("[data-i18n]").forEach(el => {
+        const key = el.getAttribute("data-i18n");
+        if (dict[key]) {
+            el.textContent = dict[key];
+        }
+    });
+
+    updateClock(); 
+    if(!silent) toast(dict["lang_saved"] || "Language preference saved!");
 }
+
+window.openMiniGames = function() {
+    const dict = i18n[currentLang] || i18n["en"];
+    toast(dict['mini_games'] || 'Mini-Games Coming soon! 🎮');
+}
+
 
 // ── FIREBASE CONFIG ──
 const firebaseConfig = {
@@ -962,7 +1128,6 @@ let aiSessionList = JSON.parse(localStorage.getItem("pd_aiSessions")) || [];
 let selectedPrio = "high";
 let selectedNoteTag = "general";
 
-// Calendar State
 let calYear = new Date().getFullYear(); 
 let calMonth = new Date().getMonth();
 
@@ -978,30 +1143,70 @@ function save(){
   syncToCloud();
 }
 
-// ── AUTH & CLOUD SYNC ──
+// ── AUTH & CLOUD SYNC & SPLASH SCREEN LOGIC ──
+let authProcessed = false;
+let authUser = null;
+
 firebase.auth().onAuthStateChanged(async (user) => {
+  authUser = user;
   if (user) {
     myUserId = user.uid;
     userDocRef = db.collection("users").doc(myUserId);
     document.getElementById("settingsEmail").innerText = user.email || "Google Authenticated";
     
-    // Hide intro immediately if logged in
-    const overlay = document.getElementById("introOverlay");
-    if(overlay) overlay.style.display = "none";
-
     await loadFromCloud();
     if(!userNickname) document.getElementById("nicknameModal").style.display = "flex";
     else { updateClock(); document.getElementById("playerNameInput").value = userNickname; }
-  } else { 
-    // Not logged in
-    if (!localStorage.getItem("pro_intro_done")) {
-        const overlay = document.getElementById("introOverlay");
-        if(overlay) overlay.style.display = "flex";
-    } else {
-        window.location.href = "index.html"; 
-    }
-  } 
+  }
+  authProcessed = true;
 });
+
+// Enforce a minimum 3-second splash screen
+const minSplashTime = new Promise(resolve => setTimeout(resolve, 3000));
+
+async function checkAppReady() {
+    await minSplashTime; // Wait at least 3 seconds
+    
+    // If Firebase is taking longer than 3 seconds, wait for it
+    while(!authProcessed) {
+        await new Promise(r => setTimeout(r, 100));
+    }
+
+    // Auth is done and 3 seconds have passed. Hide splash safely.
+    const splash = document.getElementById("splashScreen");
+    if(splash) {
+        splash.style.opacity = "0";
+        setTimeout(() => splash.style.display = "none", 800);
+    }
+
+    if (authUser) {
+        // Logged in, hide intro
+        const overlay = document.getElementById("introOverlay");
+        if(overlay) overlay.style.display = "none";
+    } else {
+        // Not logged in, show intro
+        if (!localStorage.getItem("pro_intro_done")) {
+            const overlay = document.getElementById("introOverlay");
+            if(overlay) overlay.style.display = "flex";
+        } else {
+            window.location.href = "index.html"; 
+        }
+    }
+}
+
+// Trigger the splash check
+checkAppReady();
+
+window.closeIntro = function() {
+  const overlay = document.getElementById("introOverlay");
+  if(overlay) {
+    overlay.style.opacity = "0";
+    setTimeout(() => {
+      overlay.style.display = "none";
+      localStorage.setItem("pro_intro_done", "true");
+    }, 600);
+  }
+}
 
 window.logout = function() { firebase.auth().signOut().then(() => { localStorage.clear(); window.location.href = "index.html"; }); };
 window.saveNickname = function() {
@@ -1107,13 +1312,13 @@ function updateClock(){
 
   const gr = document.getElementById("greeting");
   if(gr && userNickname){
-    if(h<12) gr.textContent=`Good Morning, ${userNickname} ✦`;
-    else if(h<17) gr.textContent=`Good Afternoon, ${userNickname} ✦`;
-    else if(h<21) gr.textContent=`Good Evening, ${userNickname} ✦`;
-    else gr.textContent=`Good Night, ${userNickname} ✦`;
+    const dict = i18n[currentLang] || i18n["en"];
+    if(h<12) gr.textContent=`${dict['greeting_m']}, ${userNickname} 📖`;
+    else if(h<17) gr.textContent=`${dict['greeting_a']}, ${userNickname} 📖`;
+    else if(h<21) gr.textContent=`${dict['greeting_e']}, ${userNickname} 📖`;
+    else gr.textContent=`${dict['greeting_n']}, ${userNickname} 📖`;
   }
 
-  // Update streak logic
   const today = now.toDateString();
   if(stats.lastDate !== today){
     const yesterday = new Date(now); yesterday.setDate(now.getDate()-1);
@@ -1121,7 +1326,6 @@ function updateClock(){
     else if(stats.lastDate !== today) stats.streak = stats.lastDate ? 0 : 1;
     stats.lastDate = today; save();
   }
-  // Reset daily trackers
   if(water.date !== today){ water = {count:0, date:today}; save(); renderWater(); }
   if(mood.date !== today && mood.date){ mood={emoji:"",label:"",date:""}; save(); }
 }
@@ -1602,7 +1806,10 @@ function updateHomeStats(){
     else if(pct>=75) mot.textContent="Almost there! Keep pushing! 🔥";
     else if(pct>=50) mot.textContent="Halfway! You're doing great! ⚡";
     else if(pct>0) mot.textContent="Great start! Keep the momentum! 💪";
-    else mot.textContent="Let's crush it today! 🚀";
+    else {
+        const dict = i18n[currentLang] || i18n["en"];
+        mot.textContent=dict['crush_it'] || "Let's crush it today! 🚀";
+    }
   }
 }
 
@@ -1626,7 +1833,11 @@ function updateTimerDisplay(){
   if(mb){ mb.className=cls; mb.textContent=txt; }
   if(fmb){ fmb.className=cls; fmb.textContent=txt; }
   
-  const lab = document.getElementById("timerLabel"); if(lab) lab.textContent=pomMode==="work"?"🎯 Focus Session":"☕ Break Time";
+  const lab = document.getElementById("timerLabel"); 
+  if(lab) {
+      const dict = i18n[currentLang] || i18n["en"];
+      lab.textContent=pomMode==="work"? `🎯 ${dict['focus_session']}` :"☕ Break Time";
+  }
   updateTimerBtns();
 }
 
@@ -1927,24 +2138,17 @@ window.sendAI = async function(){
 
 // ── NAVIGATION & SWIPE ──
 const pagesOrder=['homePage','taskPage','focusPage','roomPage','habitPage','notesPage','goalPage','leaderPage','settingsPage'];
-window.previousPage = 'homePage';
 
 window.toggleSettings = function() {
-  const isSettingsOpen = document.getElementById('settingsPage').classList.contains('active');
-  if (isSettingsOpen) {
-    const prevBtn = document.querySelector(`.nav button[onclick*="${window.previousPage}"]`);
-    switchPage(window.previousPage, prevBtn);
-  } else {
-    switchPage('settingsPage', null);
-  }
+    const isSettingsActive = document.getElementById('settingsPage').classList.contains('active');
+    if (isSettingsActive) {
+        switchPage(window.previousPage, document.querySelector(`.nav button[onclick*="${window.previousPage}"]`));
+    } else {
+        switchPage('settingsPage', null);
+    }
 }
 
 window.switchPage = function(page, btn, dir=0){
-  const navBar = document.querySelector(".nav");
-  if (navBar) {
-      navBar.style.display = (page === 'settingsPage') ? 'none' : 'flex';
-  }
-
   if (page !== 'settingsPage') {
       window.previousPage = page;
   }
@@ -1953,18 +2157,32 @@ window.switchPage = function(page, btn, dir=0){
   const np=document.getElementById(page); np.classList.add("active");
   if(dir===1) np.classList.add("slide-left"); else if(dir===-1) np.classList.add("slide-right");
   
-  // Update Bottom Nav Highlighting
-  if(btn && btn.closest('.nav')) {
-      document.querySelectorAll(".nav button").forEach(b=>b.classList.remove("active"));
-      btn.classList.add("active");
-      const ind=document.getElementById("navIndicator");
-      if(ind){ ind.style.width=btn.offsetWidth+"px"; ind.style.left=btn.offsetLeft+"px"; }
-      if(btn.parentNode.scrollTo) btn.parentNode.scrollTo({left:btn.offsetLeft-(btn.parentNode.offsetWidth/2)+(btn.offsetWidth/2),behavior:"smooth"});
+  const nav = document.querySelector(".nav");
+  const topGamesBtn = document.getElementById('miniGamesBtn');
+  const topSetBtn = document.getElementById('mainSettingsBtn');
+  const topCloseSetBtn = document.getElementById('closeSettingsBtn');
+
+  if (page === 'settingsPage') {
+      nav.style.display = 'none';
+      topGamesBtn.style.display = 'none';
+      topSetBtn.style.display = 'none';
+      topCloseSetBtn.style.display = 'flex';
   } else {
-      // Remove highlight if going to a non-nav page like settings
+      nav.style.display = 'flex';
+      topSetBtn.style.display = 'flex';
+      topCloseSetBtn.style.display = 'none';
+      topGamesBtn.style.display = (page === 'homePage') ? 'flex' : 'none';
+
       document.querySelectorAll(".nav button").forEach(b=>b.classList.remove("active"));
-      const ind=document.getElementById("navIndicator");
-      if(ind) ind.style.width = "0px";
+      if(btn && btn.closest('.nav')) {
+          btn.classList.add("active");
+          const ind=document.getElementById("navIndicator");
+          if(ind){ ind.style.width=btn.offsetWidth+"px"; ind.style.left=btn.offsetLeft+"px"; }
+          if(btn.parentNode.scrollTo) btn.parentNode.scrollTo({left:btn.offsetLeft-(btn.parentNode.offsetWidth/2)+(btn.offsetWidth/2),behavior:"smooth"});
+      } else {
+          const ind=document.getElementById("navIndicator");
+          if(ind) ind.style.width = "0px";
+      }
   }
 }
 
@@ -1981,17 +2199,19 @@ window.closeModal = function(){ document.getElementById("modal").style.display="
 
 // ── INIT ──
 window.addEventListener("DOMContentLoaded",()=>{
-  if(localStorage.getItem("pro_intro_done")) {
-    const overlay = document.getElementById("introOverlay");
-    if(overlay) overlay.style.display = "none";
-  }
   if(localStorage.getItem("pd_theme")==="dark") document.body.classList.add("dark");
   const activeBtn = document.querySelector(".nav button.active");
   if(activeBtn){ const ind=document.getElementById("navIndicator"); if(ind){ ind.style.width=activeBtn.offsetWidth+"px"; ind.style.left=activeBtn.offsetLeft+"px"; }}
 
-  // Apply saved typography logic if needed (can be extended to localstorage)
+  if(!window.previousPage) window.previousPage = 'homePage';
+
+  document.getElementById("langSelect").value = currentLang;
+  applyLanguage(true); 
+
   updateClock(); updateTimerDisplay(); updateHomeStats();
   renderTasks(); renderHabits(); renderWater(); renderNotes(); renderQuickIdeas(); renderGoals(); renderCalendar(); renderLeaderboard(); renderAchievements(); updateXP(); newAffirmation();
+  
+  document.getElementById('miniGamesBtn').style.display = 'flex';
 });
 </script>
 </body>
