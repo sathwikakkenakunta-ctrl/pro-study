@@ -51,11 +51,44 @@ input:focus { outline: none; border-color: var(--primary); background: transpare
   transition: transform 0.2s ease, background 0.15s ease; margin-bottom: 15px;
 }
 .add-btn:hover { transform: translateY(-2px); background: var(--primary-hover); }
+/* ─── SPLASH SCREEN VARIABLES & STYLES ─── */
+:root {
+  --bg: linear-gradient(135deg, #ff9a9e 0%, #fecfef 45%, #c3b1e1 75%, #a1c4fd 100%);
+  --primary: #6c63ff;
+  --sub: #5a6a7a;
+}
+
+#splashScreen {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: var(--bg); background-size: 300% 300%;
+  z-index: 999999; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  transition: opacity 0.8s ease, visibility 0.8s;
+  opacity: 1; visibility: visible;
+}
+.splash-logo {
+  font-size: 80px; margin-bottom: 20px;
+  filter: drop-shadow(0 4px 16px rgba(255,200,0,0.5));
+  animation: pulse 2s ease-in-out infinite;
+}
+.splash-version { 
+  position: absolute; bottom: 40px; font-weight: 800; font-size: 12px; 
+  color: var(--sub); letter-spacing: 2px; text-transform: uppercase; 
+}
+
+@keyframes pulse { 
+  0%,100%{transform:scale(1)} 
+  50%{transform:scale(1.05) rotate(-3deg)} 
+}
 </style>
 </head>
 
 <body>
-
+<div id="splashScreen">
+  <div class="splash-logo">📖</div>
+  <div class="splash-version">v1.5.0 • Pro Dashboard</div>
+  <div style="font-weight: 900; font-size: 14px; color: var(--primary); margin-top: 20px; font-family: 'Outfit', sans-serif;">Sathwik Akkenakunta</div>
+</div>
 <div class="container">
   <div style="text-align: center; margin-bottom: 25px;">
     <svg viewBox="0 0 24 24" style="width: 60px; height: 60px; stroke: var(--primary); fill: none; stroke-width: 2; margin-bottom: 10px;">
@@ -129,16 +162,35 @@ firebase.initializeApp(firebaseConfig);
 firebase.auth().onAuthStateChanged((user) => {
   if (user) {
     if (user.emailVerified) {
-      // Verified? Let them in.
+      // 🟢 USER IS LOGGED IN AND VERIFIED!
+      // The splash screen is currently covering the screen.
+      // Redirect immediately to the dashboard without fading it out.
       window.location.href = "dashboard.html";
     } else {
-      // Not verified? Kick them out.
-      firebase.auth().signOut();
-      alert("Hold up! You need to verify your email first. Check your inbox (and spam folder) for the verification link.");
+      // 🔴 USER IS LOGGED IN BUT NOT VERIFIED.
+      // Kick them out, show the alert, and fade out the splash screen.
+      firebase.auth().signOut().then(() => {
+        alert("Hold up! You need to verify your email first. Check your inbox (and spam folder) for the verification link.");
+        hideSplashScreen();
+      });
     }
+  } else {
+    // 🔴 NO USER LOGGED IN.
+    // They need to see the login form. Fade out the splash screen.
+    hideSplashScreen();
   }
 });
 
+// Helper function to handle the smooth splash screen fade-out
+function hideSplashScreen() {
+  setTimeout(() => {
+    const splash = document.getElementById("splashScreen");
+    if (splash) {
+      splash.style.opacity = "0";
+      setTimeout(() => splash.style.display = "none", 800);
+    }
+  }, 1000); // 1-second delay so it doesn't flash too fast
+}
 let isSignupMode = false;
 
 window.togglePasswordVisibility = function(inputId, iconId) {
