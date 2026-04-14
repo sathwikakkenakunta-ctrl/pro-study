@@ -43,7 +43,12 @@
   --shadow: 0 8px 32px rgba(0,0,0,0.5);
 }
 
-*{box-sizing:border-box;margin:0;padding:0;}
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent; 
+}
 
 body {
   font-family: var(--font);
@@ -56,28 +61,93 @@ body {
   transition: color 0.2s, background 0.2s;
   -webkit-font-smoothing: antialiased;
   font-size: var(--base-size);
+  -webkit-user-select: none;
+  user-select: none;
 }
-
+#chat, #notesPage, input, textarea {
+  -webkit-user-select: text;
+  user-select: text;
+}
 /* ─── RANK BADGE & ANIMATIONS ─── */
 .rank-crown { font-size:64px; text-align:center; display:block; filter:drop-shadow(0 4px 16px rgba(255,200,0,0.5)); animation:pulse 2s ease-in-out infinite; }
 @keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.05) rotate(-3deg)} }
 
-/* ─── SPLASH SCREEN (NEW LAYER) ─── */
+/* ─── SPLASH SCREEN (DYNAMIC & PROFESSIONAL) ─── */
 #splashScreen {
-  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-  background: var(--bg); background-size: 300% 300%;
-  z-index: 999999; display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
+  position: fixed; 
+  top: 0; left: 0; width: 100%; height: 100%;
+  /* Use the app's dynamic moving background */
+  background: var(--bg); 
+  background-size: 300% 300%;
+  animation: bgShift 18s ease infinite; 
+  /* Use the app's dynamic text color */
+  color: var(--text); 
+  z-index: 999999; 
+  display: flex; flex-direction: column;
   transition: opacity 0.8s ease, visibility 0.8s;
   opacity: 1; visibility: visible;
 }
-.splash-logo {
-  font-size: 80px; margin-bottom: 20px;
-  filter: drop-shadow(0 4px 16px rgba(255,200,0,0.5));
-  animation: pulse 2s ease-in-out infinite;
-}
-.splash-version { position: absolute; bottom: 40px; font-weight: 800; font-size: 12px; color: var(--sub); letter-spacing: 2px; text-transform: uppercase; }
 
+.splash-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1; 
+  animation: subtleFadeIn 1.2s ease-out forwards;
+}
+
+.splash-icon {
+  font-size: 54px;
+  margin-bottom: 16px;
+  /* A subtle shadow that matches the app's aesthetic */
+  filter: drop-shadow(0 4px 16px rgba(108,99,255,0.3)); 
+}
+
+.splash-title {
+  font-size: 28px;
+  font-weight: 900; /* Matches your h2 tags */
+  letter-spacing: -0.5px;
+  margin-bottom: 6px;
+  font-family: var(--font);
+}
+
+.splash-tagline {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--sub); /* Hooks into your dynamic sub-text color */
+  margin-bottom: 32px;
+}
+
+.splash-loading {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--primary); /* Uses your primary accent color (Purple/Indigo) */
+  animation: subtleBlink 1.5s infinite;
+}
+
+.splash-credit {
+  text-align: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--sub);
+  padding-bottom: 30px;
+  letter-spacing: 0.5px;
+  animation: subtleFadeIn 1.5s ease-out forwards;
+}
+
+/* Smooth, professional animations */
+@keyframes subtleFadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes subtleBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
 /* ─── ZEN MODE FIXED SELECTORS & ENHANCED STYLING ─── */
 body.zen-mode .nav, 
 body.zen-mode .top-bar, 
@@ -320,20 +390,58 @@ select option{background:var(--card); color:var(--text);}
 #introOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 5000; background: var(--bg); display: none; align-items: center; justify-content: center; padding: 20px; transition: opacity 0.6s ease; }
 .intro-card { background: var(--card); backdrop-filter: var(--blur); border: 1px solid var(--card-border); padding: 40px 30px; border-radius: 32px; box-shadow: var(--shadow); text-align: center; max-width: 360px; animation: scaleIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); }
 @keyframes scaleIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+/* ─── 2048 GAME STYLES ─── */
+.game-board {
+  width: 280px; height: 280px; background: #bbada0; border-radius: 12px;
+  margin: 0 auto; position: relative; padding: 6px;
+  display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(4, 1fr); gap: 6px;
+  touch-action: none; user-select: none;
+}
+.grid-cell { background: rgba(238, 228, 218, 0.35); border-radius: 8px; }
+.game-tile {
+  position: absolute; width: 62.5px; height: 62.5px; border-radius: 8px;
+  display: flex; justify-content: center; align-items: center;
+  font-weight: 900; font-size: 24px; font-family: var(--mono); color: #776e65;
+  transition: transform 0.15s ease-in-out, background-color 0.15s;
+  z-index: 10; top: 0; left: 0;
+}
+.tile-2 { background: #eee4da; } .tile-4 { background: #ede0c8; }
+.tile-8 { background: #f2b179; color: #f9f6f2; } .tile-16 { background: #f59563; color: #f9f6f2; }
+.tile-32 { background: #f67c5f; color: #f9f6f2; } .tile-64 { background: #f65e3b; color: #f9f6f2; }
+.tile-128 { background: #edcf72; color: #f9f6f2; font-size: 20px; box-shadow: 0 0 15px rgba(243,215,116,0.3);}
+.tile-256 { background: #edcc61; color: #f9f6f2; font-size: 20px; box-shadow: 0 0 15px rgba(243,215,116,0.4);}
+.tile-512 { background: #edc850; color: #f9f6f2; font-size: 20px; box-shadow: 0 0 15px rgba(243,215,116,0.5);}
+.tile-1024 { background: #edc53f; color: #f9f6f2; font-size: 16px; box-shadow: 0 0 15px rgba(243,215,116,0.6);}
+.tile-2048 { background: #edc22e; color: #f9f6f2; font-size: 16px; box-shadow: 0 0 15px rgba(243,215,116,0.8), inset 0 0 0 1px rgba(255,255,255,0.2);}
+/* ─── GAME HUB MENU STYLES ─── */
+.game-card { 
+  text-align: center; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; 
+  padding: 20px 10px; margin-top: 0; display: flex; flex-direction: column; align-items: center;
+}
+.game-card:hover { transform: translateY(-5px) scale(1.02); border-color: var(--primary); }
+.game-icon { 
+  width: 60px; height: 60px; border-radius: 16px; margin-bottom: 12px; 
+  display: flex; align-items: center; justify-content: center; font-size: 28px; 
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1); color: #fff;
+}
 </style>
 </head>
 <body>
 
 <div id="splashScreen">
-  <div class="splash-logo">📖</div>
-  <div class="splash-version">v1.5.0 • Pro Dashboard</div>
-  <div style="font-weight: 900; font-size: 14px; color: var(--primary); margin-top: 20px;">Sathwik Akkenakunta</div>
+  <div class="splash-content">
+    <div class="splash-icon">📖</div>
+    <h1 class="splash-title">Student Planner Pro</h1>
+    <p class="splash-tagline">Your Daily Study Companion</p>
+    <div class="splash-loading">Loading...</div>
+  </div>
+  <div class="splash-credit">Developed by Sathwik Akkenakunta</div>
 </div>
 
 <div id="introOverlay">
   <div class="intro-card">
     <div style="font-size: 60px; margin-bottom: 15px; filter:drop-shadow(0 4px 16px rgba(255,200,0,0.5)); animation: pulse 2s ease-in-out infinite;">📖</div>
-    <h1 style="font-weight: 900; margin-bottom: 10px;">Welcome to Pro Dashboard</h1>
+    <h1 style="font-weight: 900; margin-bottom: 10px;">Welcome to Dashboard</h1>
     <p style="color: var(--sub); font-size: 14px; line-height: 1.6; margin-bottom: 30px;">
       Your all-in-one workspace for deep focus, task tracking, and study rooms. Ready to level up your productivity?
     </p>
@@ -901,6 +1009,49 @@ select option{background:var(--card); color:var(--text);}
   </div>
 </div>
 
+<div id="miniGamesPage" class="page">
+  <div style="margin-top:60px;">
+    <h2 data-i18n="mini_games">Mini-Games 🎮</h2>
+    <div class="sub">Take a quick brain break</div>
+  </div>
+
+  <div id="gameSelectionMenu" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-top: 20px;">
+    
+    <div class="card game-card" onclick="openGame2048()">
+      <div class="game-icon" style="background: linear-gradient(135deg, #edc22e, #f59563);">🔢</div>
+      <h3 style="font-size: 16px;">2048</h3>
+      <p class="sub" style="font-size: 10px; margin-top: 4px;">Classic Puzzle</p>
+    </div>
+
+    <div class="card game-card" style="opacity: 0.6; cursor: not-allowed;">
+      <div class="game-icon" style="background: var(--card-border);">⏳</div>
+      <h3 style="font-size: 16px;">Coming Soon</h3>
+      <p class="sub" style="font-size: 10px; margin-top: 4px;">More games!</p>
+    </div>
+
+  </div>
+
+  <div id="activeGameContainer" style="display: none; margin-top: 20px;">
+    <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom: 20px;">
+      <button class="btn btn-sm btn-outline" onclick="closeGameMenu()">‹ Back to Games</button>
+      <div style="text-align:right; background:rgba(0,0,0,0.05); padding: 8px 16px; border-radius: 12px; border: 1px solid var(--card-border);">
+        <div style="font-size:22px; font-weight:900; color:var(--primary); font-family:var(--mono);" id="gameScore">0</div>
+        <div class="sub" style="font-size: 10px;">Score</div>
+      </div>
+    </div>
+
+    <div class="card" style="text-align:center; padding: 25px 15px; margin-top: 0;">
+      <div id="game-2048-board" class="game-board"></div>
+      <div style="margin-top:20px; display:flex; gap:10px; justify-content:center;">
+        <button class="btn" style="width: 100%;" onclick="init2048()">🔄 Restart Game</button>
+      </div>
+      <div style="font-size:12px; color:var(--sub); margin-top:15px; font-weight: 700;">
+        Swipe or use Arrow Keys to play!
+      </div>
+    </div>
+  </div>
+</div>
+
 </div>
 <div class="nav">
   <div class="indicator" id="navIndicator"></div>
@@ -988,7 +1139,7 @@ const i18n = {
      saved_notes: "Saved Notes", quick_ideas: "Quick Ideas", your_level: "Your Level", goals_timeline: "Goals Timeline",
      top_priority: "Top Priority", your_rank: "Your Rank", your_stats: "Your Stats", top_scholars: "Top Scholars",
      achievements: "Achievements", weekly_recap: "Weekly Recap", gen_recap: "📊 Generate Recap",
-     zen_mode: "🧘 Zen Mode", exit_zen: "✕ Exit Zen Mode", mini_games: "Mini-Games Coming soon! 🎮",
+     zen_mode: "🧘 Zen Mode", exit_zen: "✕ Exit Zen Mode", mini_games: "Mini-Games 🎮",
      lang_saved: "Language preference saved!"
   },
   te: {
@@ -1055,7 +1206,7 @@ const i18n = {
      logout: "Se déconnecter", task_board: "Tableau des Tâches", focus_flow: "Flux de Concentration",
      study_rooms: "Salles d'Étude", habit_forge: "Forge d'Habitudes", mind_dump: "Vidage Mental", goal_vault: "Coffre d'Objectifs",
      leaderboard: "Classement", start_time: "Heure de début", end_time: "Heure de fin", add_task: "＋ Ajouter Tâche",
-     active: "Actif", completed: "Terminé", room_hub: "Centre des Salles", join_search: "Rejoindre / Chercher",
+     active: "Activo", completed: "Terminé", room_hub: "Centre des Salles", join_search: "Rejoindre / Chercher",
      create_new: "Créer Nouveau", add_habit: "＋ Ajouter Habitude", hydration: "Suivi d'Hydratation", daily_habits: "Habitudes Quotidiennes",
      saved_notes: "Notes Enregistrées", quick_ideas: "Idées Rapides", your_level: "Votre Niveau", goals_timeline: "Chronologie",
      top_priority: "Priorité Absolue", your_rank: "Votre Rang", your_stats: "Vos Statistiques", top_scholars: "Meilleurs Étudiants",
@@ -1087,8 +1238,7 @@ window.applyLanguage = function(silent = false) {
 }
 
 window.openMiniGames = function() {
-    const dict = i18n[currentLang] || i18n["en"];
-    toast(dict['mini_games'] || 'Mini-Games Coming soon! 🎮');
+    switchPage('miniGamesPage', null);
 }
 
 
@@ -2137,11 +2287,13 @@ window.sendAI = async function(){
 }
 
 // ── NAVIGATION & SWIPE ──
-const pagesOrder=['homePage','taskPage','focusPage','roomPage','habitPage','notesPage','goalPage','leaderPage','settingsPage'];
+const pagesOrder=['homePage','taskPage','focusPage','roomPage','habitPage','notesPage','goalPage','leaderPage','settingsPage', 'miniGamesPage'];
 
 window.toggleSettings = function() {
     const isSettingsActive = document.getElementById('settingsPage').classList.contains('active');
-    if (isSettingsActive) {
+    const isGamesActive = document.getElementById('miniGamesPage') && document.getElementById('miniGamesPage').classList.contains('active');
+
+    if (isSettingsActive || isGamesActive) {
         switchPage(window.previousPage, document.querySelector(`.nav button[onclick*="${window.previousPage}"]`));
     } else {
         switchPage('settingsPage', null);
@@ -2149,7 +2301,7 @@ window.toggleSettings = function() {
 }
 
 window.switchPage = function(page, btn, dir=0){
-  if (page !== 'settingsPage') {
+  if (page !== 'settingsPage' && page !== 'miniGamesPage') {
       window.previousPage = page;
   }
 
@@ -2162,7 +2314,7 @@ window.switchPage = function(page, btn, dir=0){
   const topSetBtn = document.getElementById('mainSettingsBtn');
   const topCloseSetBtn = document.getElementById('closeSettingsBtn');
 
-  if (page === 'settingsPage') {
+  if (page === 'settingsPage' || page === 'miniGamesPage') {
       nav.style.display = 'none';
       topGamesBtn.style.display = 'none';
       topSetBtn.style.display = 'none';
@@ -2213,6 +2365,159 @@ window.addEventListener("DOMContentLoaded",()=>{
   
   document.getElementById('miniGamesBtn').style.display = 'flex';
 });
+// ── 2048 GAME ENGINE ──
+let board2048 = [];
+let score2048 = 0;
+let gameInitialized = false;
+
+window.init2048 = function() {
+    board2048 = [[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]];
+    score2048 = 0; gameInitialized = true;
+    addRandomTile2048(); addRandomTile2048();
+    draw2048();
+}
+
+function addRandomTile2048() {
+    let empty = [];
+    for(let r=0; r<4; r++) for(let c=0; c<4; c++) if(board2048[r][c]===0) empty.push({r,c});
+    if(empty.length > 0) {
+        let pos = empty[Math.floor(Math.random() * empty.length)];
+        board2048[pos.r][pos.c] = Math.random() < 0.9 ? 2 : 4;
+    }
+}
+
+function draw2048() {
+    const boardDiv = document.getElementById('game-2048-board');
+    if(!boardDiv) return;
+    boardDiv.innerHTML = Array(16).fill('<div class="grid-cell"></div>').join(''); // Base Grid
+    for(let r=0; r<4; r++) {
+        for(let c=0; c<4; c++) {
+            if(board2048[r][c] !== 0) {
+                let val = board2048[r][c];
+                let tile = document.createElement('div');
+                tile.className = `game-tile tile-${val}`;
+                tile.innerText = val;
+                // 6px padding + cell size (62.5px) + 6px gap = 68.5px multiplier
+                tile.style.transform = `translate(${6 + c * 68.5}px, ${6 + r * 68.5}px)`;
+                boardDiv.appendChild(tile);
+            }
+        }
+    }
+    document.getElementById('gameScore').innerText = score2048;
+}
+
+window.move2048 = function(e) {
+    const page = document.getElementById('miniGamesPage');
+    if(!page || !page.classList.contains('active')) return; // Only run if tab is open
+    if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.key)) e.preventDefault(); 
+    
+    let oldBoard = JSON.stringify(board2048);
+    const transpose = m => m[0].map((x,i) => m.map(x => x[i])); // Matrix rotation magic
+    
+    const slide = (row) => {
+        let arr = row.filter(val => val); // Remove zeros
+        for(let i=0; i<arr.length-1; i++) {
+            if(arr[i] !== 0 && arr[i] === arr[i+1]) {
+                arr[i] *= 2; score2048 += arr[i]; arr[i+1] = 0; // Merge
+            }
+        }
+        arr = arr.filter(val => val); // Remove zeros again
+        while(arr.length < 4) arr.push(0); // Pad with zeros
+        return arr;
+    }
+
+    if(e.key === 'ArrowLeft') board2048 = board2048.map(row => slide(row));
+    else if(e.key === 'ArrowRight') board2048 = board2048.map(row => slide(row.reverse()).reverse());
+    else if(e.key === 'ArrowUp') board2048 = transpose(transpose(board2048).map(row => slide(row)));
+    else if(e.key === 'ArrowDown') board2048 = transpose(transpose(board2048).map(row => slide(row.reverse()).reverse()));
+    else return;
+
+    if(oldBoard !== JSON.stringify(board2048)) {
+        addRandomTile2048(); draw2048();
+    }
+}
+
+// Global Keyboard Listener
+document.addEventListener('keydown', move2048, {passive: false});
+
+// Mobile Swipe Listener specifically for the 2048 board
+let tX=0, tY=0;
+document.addEventListener("touchstart", e => {
+    if(e.target.closest("#game-2048-board")) {
+        tX = e.changedTouches[0].screenX; tY = e.changedTouches[0].screenY;
+        e.stopPropagation(); // Prevent tab switching
+    }
+}, {passive: false});
+
+document.addEventListener("touchend", e => {
+    if(e.target.closest("#game-2048-board")) {
+        e.stopPropagation();
+        let dX = e.changedTouches[0].screenX - tX;
+        let dY = e.changedTouches[0].screenY - tY;
+        if(Math.abs(dX) > Math.abs(dY) && Math.abs(dX) > 30) {
+            move2048({key: dX > 0 ? 'ArrowRight' : 'ArrowLeft', preventDefault: ()=>{}});
+        } else if(Math.abs(dY) > 30) {
+            move2048({key: dY > 0 ? 'ArrowDown' : 'ArrowUp', preventDefault: ()=>{}});
+        }
+    }
+}, {passive: false});
+
+// Update the Top Bar button to initialize the game when clicked
+// ── GAME HUB ROUTING ──
+window.openMiniGames = function() {
+    switchPage('miniGamesPage', null);
+    // Always show the menu first, hide the active game
+    document.getElementById('gameSelectionMenu').style.display = 'grid';
+    document.getElementById('activeGameContainer').style.display = 'none';
+}
+
+window.openGame2048 = function() {
+    document.getElementById('gameSelectionMenu').style.display = 'none';
+    document.getElementById('activeGameContainer').style.display = 'block';
+    // Initialize the game if it hasn't been started yet
+    if (!gameInitialized) init2048();
+}
+
+window.closeGameMenu = function() {
+    document.getElementById('activeGameContainer').style.display = 'none';
+    document.getElementById('gameSelectionMenu').style.display = 'grid';
+}
+
+// ── 2048 MOVEMENT LOGIC ──
+window.move2048 = function(e) {
+    const page = document.getElementById('miniGamesPage');
+    const gameArea = document.getElementById('activeGameContainer');
+    
+    // Safety check: Only run if the Games Tab is open AND the actual Game Area is visible
+    if(!page || !page.classList.contains('active') || gameArea.style.display === 'none') return;
+    
+    if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.key)) e.preventDefault(); 
+    
+    let oldBoard = JSON.stringify(board2048);
+    const transpose = m => m[0].map((x,i) => m.map(x => x[i])); 
+    
+    const slide = (row) => {
+        let arr = row.filter(val => val); 
+        for(let i=0; i<arr.length-1; i++) {
+            if(arr[i] !== 0 && arr[i] === arr[i+1]) {
+                arr[i] *= 2; score2048 += arr[i]; arr[i+1] = 0; 
+            }
+        }
+        arr = arr.filter(val => val); 
+        while(arr.length < 4) arr.push(0); 
+        return arr;
+    }
+
+    if(e.key === 'ArrowLeft') board2048 = board2048.map(row => slide(row));
+    else if(e.key === 'ArrowRight') board2048 = board2048.map(row => slide(row.reverse()).reverse());
+    else if(e.key === 'ArrowUp') board2048 = transpose(transpose(board2048).map(row => slide(row)));
+    else if(e.key === 'ArrowDown') board2048 = transpose(transpose(board2048).map(row => slide(row.reverse()).reverse()));
+    else return;
+
+    if(oldBoard !== JSON.stringify(board2048)) {
+        addRandomTile2048(); draw2048();
+    }
+}
 </script>
 </body>
 </html>
