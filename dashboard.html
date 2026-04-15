@@ -562,10 +562,30 @@ select option{background:var(--card); color:var(--text);}
 }
 .top-ai-btn:hover { transform: scale(1.1) rotate(-5deg); box-shadow: 0 6px 16px rgba(247, 37, 133, 0.5); }
 .top-ai-btn svg { width: 18px; height: 18px; stroke: #fff; stroke-width: 2; fill: none; }
+/* ─── MEMORY GAME STYLES ─── */
+.memory-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; width: 100%; max-width: 280px; margin: 0 auto; perspective: 1000px; }
+.memory-card { aspect-ratio: 1; background: var(--card); border: 2px solid var(--card-border); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 28px; cursor: pointer; transition: transform 0.4s, background 0.3s, border-color 0.3s; transform-style: preserve-3d; position: relative; box-shadow: var(--shadow); }
+.dark .memory-card { background: rgba(255,255,255,0.05); }
+.memory-card.flipped { transform: rotateY(180deg); background: rgba(108,99,255,0.15); border-color: var(--primary); }
+.memory-card.matched { transform: rotateY(180deg) scale(0.95); background: rgba(6,214,160,0.2); border-color: var(--green); cursor: default; }
+.memory-card .emoji { display: none; transform: rotateY(180deg); }
+.memory-card.flipped .emoji, .memory-card.matched .emoji { display: block; }
+/* ─── TIC-TAC-TOE STYLES ─── */
+.ttt-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; width: 100%; max-width: 240px; margin: 0 auto; }
+.ttt-cell { aspect-ratio: 1; background: var(--card); border: 2px solid var(--card-border); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 48px; font-weight: 900; font-family: var(--font); cursor: pointer; transition: 0.2s; box-shadow: var(--shadow); color: var(--text); }
+.dark .ttt-cell { background: rgba(255,255,255,0.05); }
+.ttt-cell:hover { background: rgba(108,99,255,0.1); border-color: var(--primary); transform: translateY(-2px); }
+.ttt-cell.x { color: var(--primary); }
+.ttt-cell.o { color: var(--secondary); }
+/* ─── SPEED MATH STYLES ─── */
+.math-question { font-size: 38px; font-weight: 900; font-family: var(--mono); color: var(--primary); margin: 20px 0; }
+.math-options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; max-width: 240px; margin: 0 auto; }
+.math-btn { padding: 15px; font-size: 22px; font-weight: 800; border-radius: 12px; border: 2px solid var(--card-border); background: var(--card); color: var(--text); cursor: pointer; transition: 0.2s; box-shadow: var(--shadow); }
+.dark .math-btn { background: rgba(255,255,255,0.05); }
+.math-btn:hover { background: var(--primary); border-color: var(--primary); color: #fff; transform: translateY(-2px); }
 </style>
 </head>
 <body>
-
 <div id="splashScreen">
   <div class="splash-content">
     <div class="splash-icon">📖</div>
@@ -1157,47 +1177,92 @@ select option{background:var(--card); color:var(--text);}
     <button class="btn" onclick="generateWeeklyRecap()" style="width:100%;margin-top:12px;" data-i18n="gen_recap">📊 Generate Recap</button>
   </div>
 </div>
-
-<div id="miniGamesPage" class="page">
+  <div id="miniGamesPage" class="page">
   <div style="margin-top:60px;">
     <h2 data-i18n="mini_games">Mini-Games 🎮</h2>
     <div class="sub">Take a quick brain break</div>
   </div>
 
   <div id="gameSelectionMenu" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-top: 20px;">
-    
-    <div class="card game-card" onclick="openGame2048()">
+    <div class="card game-card" onclick="openGame('2048')">
       <div class="game-icon" style="background: linear-gradient(135deg, #edc22e, #f59563);">🔢</div>
       <h3 style="font-size: 16px;">2048</h3>
       <p class="sub" style="font-size: 10px; margin-top: 4px;">Classic Puzzle</p>
     </div>
-
-    <div class="card game-card" style="opacity: 0.6; cursor: not-allowed;">
-      <div class="game-icon" style="background: var(--card-border);">⏳</div>
-      <h3 style="font-size: 16px;">Coming Soon</h3>
-      <p class="sub" style="font-size: 10px; margin-top: 4px;">More games!</p>
+    
+    <div class="card game-card" onclick="openGame('memory')">
+      <div class="game-icon" style="background: linear-gradient(135deg, var(--primary), var(--accent));">🧠</div>
+      <h3 style="font-size: 16px;">Memory</h3>
+      <p class="sub" style="font-size: 10px; margin-top: 4px;">Match Emojis</p>
     </div>
 
+    <div class="card game-card" onclick="openGame('tictactoe')">
+      <div class="game-icon" style="background: linear-gradient(135deg, var(--green), var(--accent));">⭕</div>
+      <h3 style="font-size: 16px;">Tic-Tac-Toe</h3>
+      <p class="sub" style="font-size: 10px; margin-top: 4px;">Quick Match</p>
+    </div>
+
+    <div class="card game-card" onclick="openGame('math')">
+      <div class="game-icon" style="background: linear-gradient(135deg, #4cc9f0, #6c63ff);">⚡</div>
+      <h3 style="font-size: 16px;">Speed Math</h3>
+      <p class="sub" style="font-size: 10px; margin-top: 4px;">30s Blitz</p>
+    </div>
+
+    <div class="card game-card" style="grid-column: span 2; opacity: 0.6; cursor: default; padding: 20px 10px;">
+      <h3 style="font-size: 16px; color: var(--sub);">More Games Coming Soon! 🚀</h3>
+      <p class="sub" style="font-size: 10px; margin-top: 6px;">Stay tuned for updates</p>
+    </div>
   </div>
 
   <div id="activeGameContainer" style="display: none; margin-top: 20px;">
     <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom: 20px;">
-      <button class="btn btn-sm btn-outline" onclick="closeGameMenu()">‹ Back to Games</button>
-      <div style="text-align:right; background:rgba(0,0,0,0.05); padding: 8px 16px; border-radius: 12px; border: 1px solid var(--card-border);">
-        <div style="font-size:22px; font-weight:900; color:var(--primary); font-family:var(--mono);" id="gameScore">0</div>
-        <div class="sub" style="font-size: 10px;">Score</div>
+      <button class="btn btn-sm btn-outline" onclick="closeGameMenu()">‹ Back</button>
+      
+      <div style="display:flex; gap:10px;" id="dynamicScoreboard">
+        <div style="text-align:right; background:rgba(0,0,0,0.05); padding: 8px 16px; border-radius: 12px; border: 1px solid var(--card-border);">
+          <div style="font-size:22px; font-weight:900; color:var(--primary); font-family:var(--mono);" id="gameScore">0</div>
+          <div class="sub" style="font-size: 10px;" id="scoreLabel">Score</div>
+        </div>
+        <div style="text-align:right; background:rgba(0,0,0,0.05); padding: 8px 16px; border-radius: 12px; border: 1px solid var(--card-border);" id="bestScoreBox">
+          <div style="font-size:22px; font-weight:900; color:var(--orange); font-family:var(--mono);" id="bestScore">0</div>
+          <div class="sub" style="font-size: 10px;" id="bestLabel">Best</div>
+        </div>
       </div>
     </div>
 
-    <div class="card" style="text-align:center; padding: 25px 15px; margin-top: 0;">
+    <div class="card" id="wrapper-2048" style="display:none; text-align:center; padding: 25px 15px; margin-top: 0;">
       <div id="game-2048-board" class="game-board"></div>
       <div style="margin-top:20px; display:flex; gap:10px; justify-content:center;">
-        <button class="btn" style="width: 100%;" onclick="init2048()">🔄 Restart Game</button>
+        <button class="btn" style="width: 100%;" onclick="init2048()">🔄 Restart 2048</button>
       </div>
-      <div style="font-size:12px; color:var(--sub); margin-top:15px; font-weight: 700;">
-        Swipe or use Arrow Keys to play!
+      <div style="font-size:12px; color:var(--sub); margin-top:15px; font-weight: 700;">Swipe or use Arrow Keys to play!</div>
+    </div>
+
+    <div class="card" id="wrapper-memory" style="display:none; text-align:center; padding: 25px 15px; margin-top: 0;">
+      <div id="game-memory-board" class="memory-grid"></div>
+      <div style="margin-top:20px; display:flex; gap:10px; justify-content:center;">
+        <button class="btn" style="width: 100%;" onclick="initMemory()">🔄 Restart Memory</button>
+      </div>
+      <div style="font-size:12px; color:var(--sub); margin-top:15px; font-weight: 700;">Find all matching pairs!</div>
+    </div>
+
+    <div class="card" id="wrapper-tictactoe" style="display:none; text-align:center; padding: 25px 15px; margin-top: 0;">
+      <div id="game-ttt-board" class="ttt-grid"></div>
+      <div id="ttt-status" style="font-size:18px; font-weight:800; color:var(--primary); margin-top:20px; height: 24px;">Your Turn! (X)</div>
+      <div style="margin-top:20px; display:flex; gap:10px; justify-content:center;">
+        <button class="btn" style="width: 100%;" onclick="initTicTacToe()">🔄 Restart Match</button>
       </div>
     </div>
+
+    <div class="card" id="wrapper-math" style="display:none; text-align:center; padding: 25px 15px; margin-top: 0;">
+      <div id="math-timer" style="font-size: 16px; font-weight: 800; color: var(--secondary);">Time: 30s</div>
+      <div id="math-question" class="math-question">Ready?</div>
+      <div id="math-options" class="math-options">
+        <button class="math-btn" style="grid-column: span 2;" onclick="startMath()">Start Blitz</button>
+      </div>
+      <div id="math-status" style="margin-top: 15px; height: 20px; font-weight: 700; color: var(--green);"></div>
+    </div>
+
   </div>
 </div>
 
@@ -2534,11 +2599,13 @@ window.addEventListener("DOMContentLoaded",()=>{
 // ── 2048 GAME ENGINE ──
 let board2048 = [];
 let score2048 = 0;
+let best2048 = localStorage.getItem("pd_best2048") || 0; // Loads saved high score
 let gameInitialized = false;
 
 window.init2048 = function() {
     board2048 = [[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]];
     score2048 = 0; gameInitialized = true;
+    document.getElementById('bestScore').innerText = best2048; // Sets UI on load
     addRandomTile2048(); addRandomTile2048();
     draw2048();
 }
@@ -2563,13 +2630,20 @@ function draw2048() {
                 let tile = document.createElement('div');
                 tile.className = `game-tile tile-${val}`;
                 tile.innerText = val;
-                // 6px padding + cell size (62.5px) + 6px gap = 68.5px multiplier
                 tile.style.transform = `translate(${6 + c * 68.5}px, ${6 + r * 68.5}px)`;
                 boardDiv.appendChild(tile);
             }
         }
     }
+    
     document.getElementById('gameScore').innerText = score2048;
+    
+    // High Score tracking logic
+    if (score2048 > best2048) {
+        best2048 = score2048;
+        localStorage.setItem("pd_best2048", best2048);
+        document.getElementById('bestScore').innerText = best2048;
+    }
 }
 
 window.move2048 = function(e) {
@@ -2701,6 +2775,292 @@ window.handleGlobalSearch = function(e) {
             e.target.value = "";
             e.target.blur();
         }
+    }
+}
+// ── UPDATED GAME HUB ROUTING ──
+let currentGame = null;
+
+window.openMiniGames = function() {
+    switchPage('miniGamesPage', null);
+    document.getElementById('gameSelectionMenu').style.display = 'grid';
+    document.getElementById('activeGameContainer').style.display = 'none';
+}
+
+window.openGame = function(gameId) {
+    document.getElementById('gameSelectionMenu').style.display = 'none';
+    document.getElementById('activeGameContainer').style.display = 'block';
+    
+    // Hide all wrappers
+    ['2048', 'memory', 'tictactoe', 'math'].forEach(id => {
+        document.getElementById('wrapper-' + id).style.display = 'none';
+    });
+    
+    // Show selected
+    document.getElementById('wrapper-' + gameId).style.display = 'block';
+    currentGame = gameId;
+
+    if (gameId === '2048') {
+        document.getElementById('dynamicScoreboard').style.display = 'flex';
+        document.getElementById('bestScoreBox').style.display = 'block';
+        document.getElementById('scoreLabel').innerText = 'Score';
+        if (!gameInitialized) init2048();
+        else {
+            document.getElementById('gameScore').innerText = score2048;
+            document.getElementById('bestScore').innerText = best2048;
+        }
+    } else if (gameId === 'memory') {
+        document.getElementById('dynamicScoreboard').style.display = 'flex';
+        document.getElementById('bestScoreBox').style.display = 'none';
+        document.getElementById('scoreLabel').innerText = 'Moves';
+        initMemory(); 
+    } else if (gameId === 'tictactoe') {
+        document.getElementById('dynamicScoreboard').style.display = 'none'; 
+        initTicTacToe();
+    } else if (gameId === 'math') {
+        document.getElementById('dynamicScoreboard').style.display = 'flex';
+        document.getElementById('bestScoreBox').style.display = 'none';
+        document.getElementById('scoreLabel').innerText = 'Correct';
+        initMath();
+    }
+}
+window.closeGameMenu = function() {
+    document.getElementById('activeGameContainer').style.display = 'none';
+    document.getElementById('gameSelectionMenu').style.display = 'grid';
+    currentGame = null;
+}
+
+// ── TIC-TAC-TOE ENGINE ──
+let tttBoard = ['', '', '', '', '', '', '', '', ''];
+let tttActive = false;
+
+window.initTicTacToe = function() {
+    tttBoard = ['', '', '', '', '', '', '', '', ''];
+    tttActive = true;
+    const status = document.getElementById('ttt-status');
+    status.innerText = "Your Turn! (X)";
+    status.style.color = "var(--primary)";
+    drawTicTacToe();
+}
+
+function drawTicTacToe() {
+    const grid = document.getElementById("game-ttt-board");
+    if(!grid) return;
+    grid.innerHTML = "";
+    tttBoard.forEach((cell, index) => {
+        const div = document.createElement("div");
+        div.className = `ttt-cell ${cell === 'X' ? 'x' : (cell === 'O' ? 'o' : '')}`;
+        div.innerText = cell;
+        div.onclick = () => makeTttMove(index);
+        grid.appendChild(div);
+    });
+}
+
+function makeTttMove(index) {
+    if (!tttActive || tttBoard[index] !== '') return;
+    
+    // Player move
+    tttBoard[index] = 'X';
+    drawTicTacToe();
+    
+    if (checkTttWin('X')) {
+        endTicTacToe("You Won! +10 XP 🏆", "var(--green)");
+        addXP(10);
+        return;
+    }
+    if (!tttBoard.includes('')) {
+        endTicTacToe("It's a Draw! 🤝", "var(--sub)");
+        return;
+    }
+
+    // AI Move
+    tttActive = false; // Lock board
+    document.getElementById('ttt-status').innerText = "AI is thinking...";
+    
+    setTimeout(() => {
+        let emptyIndices = tttBoard.map((val, i) => val === '' ? i : null).filter(val => val !== null);
+        let aiMove = emptyIndices[Math.floor(Math.random() * emptyIndices.length)];
+        tttBoard[aiMove] = 'O';
+        drawTicTacToe();
+        
+        if (checkTttWin('O')) {
+            endTicTacToe("AI Won! Try again 🤖", "var(--secondary)");
+        } else if (!tttBoard.includes('')) {
+            endTicTacToe("It's a Draw! 🤝", "var(--sub)");
+        } else {
+            tttActive = true; // Unlock board
+            document.getElementById('ttt-status').innerText = "Your Turn! (X)";
+        }
+    }, 500); // 500ms fake thinking delay
+}
+
+function checkTttWin(player) {
+    const wins = [
+        [0,1,2], [3,4,5], [6,7,8], // Rows
+        [0,3,6], [1,4,7], [2,5,8], // Cols
+        [0,4,8], [2,4,6]           // Diagonals
+    ];
+    return wins.some(combo => combo.every(i => tttBoard[i] === player));
+}
+
+function endTicTacToe(msg, color) {
+    tttActive = false;
+    const status = document.getElementById('ttt-status');
+    status.innerText = msg;
+    status.style.color = color;
+}
+
+window.closeGameMenu = function() {
+    document.getElementById('activeGameContainer').style.display = 'none';
+    document.getElementById('gameSelectionMenu').style.display = 'grid';
+    currentGame = null;
+}
+
+// ── MEMORY GAME ENGINE ──
+let memoryCards = [], flippedCards = [], matchedPairs = 0, moves = 0;
+const memoryEmojis = ['🍎','🚀','🎓','🔥','📚','🧠','🎯','💎'];
+
+window.initMemory = function() {
+    const grid = document.getElementById("game-memory-board");
+    grid.innerHTML = "";
+    matchedPairs = 0; moves = 0; flippedCards = [];
+    document.getElementById("gameScore").innerText = moves;
+    
+    // Create pairs and shuffle
+    memoryCards = [...memoryEmojis, ...memoryEmojis].sort(() => Math.random() - 0.5);
+    
+    memoryCards.forEach((emoji, index) => {
+        const card = document.createElement("div");
+        card.className = "memory-card";
+        card.dataset.emoji = emoji;
+        card.innerHTML = `<span class="emoji">${emoji}</span>`;
+        card.onclick = () => flipCard(card);
+        grid.appendChild(card);
+    });
+}
+
+function flipCard(card) {
+    if (flippedCards.length < 2 && !card.classList.contains('flipped') && !card.classList.contains('matched')) {
+        card.classList.add('flipped');
+        flippedCards.push(card);
+        
+        if (flippedCards.length === 2) {
+            moves++;
+            document.getElementById("gameScore").innerText = moves;
+            setTimeout(checkMemoryMatch, 600);
+        }
+    }
+}
+
+function checkMemoryMatch() {
+    const [c1, c2] = flippedCards;
+    if (c1.dataset.emoji === c2.dataset.emoji) {
+        c1.classList.replace('flipped', 'matched');
+        c2.classList.replace('flipped', 'matched');
+        matchedPairs++;
+        
+        if (matchedPairs === memoryEmojis.length) {
+            toast("Memory Master! +25 XP 🏆");
+            addXP(25);
+        }
+    } else {
+        c1.classList.remove('flipped');
+        c2.classList.remove('flipped');
+    }
+    flippedCards = [];
+}
+// ── SPEED MATH ENGINE ──
+let mathTimer = null;
+let mathTimeLeft = 30;
+let mathScore = 0;
+let correctMathAns = 0;
+
+window.initMath = function() {
+    document.getElementById('gameScore').innerText = '0';
+    document.getElementById('math-timer').innerText = "Time: 30s";
+    document.getElementById('math-timer').style.color = "var(--secondary)";
+    document.getElementById('math-question').innerText = "Ready?";
+    document.getElementById('math-options').innerHTML = '<button class="math-btn" style="grid-column: span 2;" onclick="startMath()">Start 30s Blitz</button>';
+    document.getElementById('math-status').innerText = "";
+    clearInterval(mathTimer);
+}
+
+window.startMath = function() {
+    mathScore = 0;
+    mathTimeLeft = 30;
+    document.getElementById('gameScore').innerText = mathScore;
+    document.getElementById('math-status').innerText = "";
+    document.getElementById('math-timer').style.color = "var(--primary)";
+    nextMathQuestion();
+    
+    clearInterval(mathTimer);
+    mathTimer = setInterval(() => {
+        mathTimeLeft--;
+        document.getElementById('math-timer').innerText = `Time: ${mathTimeLeft}s`;
+        if (mathTimeLeft <= 5) document.getElementById('math-timer').style.color = "var(--secondary)";
+        
+        if (mathTimeLeft <= 0) {
+            clearInterval(mathTimer);
+            endMathGame();
+        }
+    }, 1000);
+}
+
+function nextMathQuestion() {
+    const ops = ['+', '-', '*'];
+    const op = ops[Math.floor(Math.random() * ops.length)];
+    let num1, num2;
+    
+    if (op === '+') { num1 = Math.floor(Math.random() * 50); num2 = Math.floor(Math.random() * 50); correctMathAns = num1 + num2; }
+    else if (op === '-') { num1 = Math.floor(Math.random() * 50) + 20; num2 = Math.floor(Math.random() * num1); correctMathAns = num1 - num2; }
+    else { num1 = Math.floor(Math.random() * 12); num2 = Math.floor(Math.random() * 12); correctMathAns = num1 * num2; }
+
+    document.getElementById('math-question').innerText = `${num1} ${op} ${num2}`;
+    
+    // Generate multiple choice options
+    let options = [correctMathAns];
+    while(options.length < 4) {
+        let wrong = correctMathAns + (Math.floor(Math.random() * 20) - 10);
+        if (!options.includes(wrong) && wrong >= 0) options.push(wrong);
+    }
+    options.sort(() => Math.random() - 0.5); // Shuffle array
+
+    const optionsDiv = document.getElementById('math-options');
+    optionsDiv.innerHTML = "";
+    options.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.className = 'math-btn';
+        btn.innerText = opt;
+        btn.onclick = () => checkMathAnswer(opt);
+        optionsDiv.appendChild(btn);
+    });
+}
+
+function checkMathAnswer(ans) {
+    if (ans === correctMathAns) {
+        mathScore++;
+        document.getElementById('gameScore').innerText = mathScore;
+        document.getElementById('math-status').innerText = "Correct! 🔥";
+        document.getElementById('math-status').style.color = "var(--green)";
+        nextMathQuestion();
+    } else {
+        mathTimeLeft -= 3; // Penalty for wrong answer
+        document.getElementById('math-status').innerText = "-3s Penalty! ❌";
+        document.getElementById('math-status').style.color = "var(--secondary)";
+        if(mathTimeLeft <= 0) { mathTimeLeft = 0; clearInterval(mathTimer); endMathGame(); }
+        else { document.getElementById('math-timer').innerText = `Time: ${mathTimeLeft}s`; }
+    }
+}
+
+function endMathGame() {
+    document.getElementById('math-question').innerText = "Time's Up!";
+    document.getElementById('math-options').innerHTML = '<button class="math-btn" style="grid-column: span 2;" onclick="startMath()">Play Again</button>';
+    document.getElementById('math-status').innerText = `Final Score: ${mathScore}`;
+    document.getElementById('math-status').style.color = "var(--primary)";
+    
+    if (mathScore >= 5) {
+        let xpEarned = mathScore * 2;
+        toast(`Math Whiz! +${xpEarned} XP 🧠`);
+        addXP(xpEarned);
     }
 }
 </script>
