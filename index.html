@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Student Planner Pro | Master Your Studies</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;700;900&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --bg: #0f0c29;
+    --bg-gradient: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+    --primary: #6c63ff;
+    --secondary: #f72585;
+    --accent: #4cc9f0;
+    --text: #ffffff;
+    --sub: #a0a0c0;
+    --card: rgba(255, 255, 255, 0.05);
+    --card-border: rgba(255, 255, 255, 0.1);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Outfit', sans-serif;
+    background: var(--bg-gradient);
+    background-size: 200% 200%;
+    animation: bgShift 15s ease infinite;
+    color: var(--text);
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  @keyframes bgShift { 
+    0% { background-position: 0% 50%; } 
+    50% { background-position: 100% 50%; } 
+    100% { background-position: 0% 50%; } 
+  }
+
+  /* ─── NAVIGATION ─── */
+  nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 5%;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .logo { font-size: 24px; font-weight: 900; letter-spacing: -0.5px; display: flex; align-items: center; gap: 8px; }
+  .launch-btn {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: #fff;
+    text-decoration: none;
+    padding: 10px 24px;
+    border-radius: 50px;
+    font-weight: 700;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 4px 15px rgba(247, 37, 133, 0.3);
+  }
+  .launch-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(247, 37, 133, 0.5); }
+
+  /* ─── HERO SECTION ─── */
+  .hero {
+    text-align: center;
+    padding: 100px 20px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  .hero-badge {
+    display: inline-block;
+    background: rgba(108, 99, 255, 0.2);
+    color: var(--accent);
+    padding: 6px 16px;
+    border-radius: 50px;
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    border: 1px solid rgba(108, 99, 255, 0.4);
+  }
+  .hero h1 {
+    font-size: 54px;
+    font-weight: 900;
+    line-height: 1.1;
+    margin-bottom: 20px;
+    background: linear-gradient(to right, #fff, #a1c4fd);
+    /* Standard property */
+background-clip: text; 
+
+/* Vendor prefix for Safari/Chrome/Edge support */
+-webkit-background-clip: text; 
+
+/* Required to make the text transparent so the background shows through */
+-webkit-text-fill-color: transparent;
+    -webkit-text-fill-color: transparent;
+  }
+  .hero p { font-size: 18px; color: var(--sub); margin-bottom: 40px; max-width: 600px; margin-inline: auto; }
+  .cta-group { display: flex; justify-content: center; gap: 15px; }
+
+  /* ─── FEATURES GRID ─── */
+  .features {
+    padding: 60px 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 25px;
+  }
+  .feature-card {
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    padding: 30px;
+    border-radius: 24px;
+    backdrop-filter: blur(10px);
+    transition: transform 0.3s, border-color 0.3s;
+  }
+  .feature-card:hover { transform: translateY(-5px); border-color: var(--primary); }
+  .feature-icon {
+    font-size: 40px;
+    margin-bottom: 15px;
+  }
+  .feature-card h3 { font-size: 20px; font-weight: 800; margin-bottom: 10px; }
+  .feature-card p { font-size: 14px; color: var(--sub); }
+
+  /* ─── FOOTER ─── */
+  footer {
+    text-align: center;
+    padding: 40px 20px;
+    border-top: 1px solid var(--card-border);
+    margin-top: 50px;
+    color: var(--sub);
+    font-size: 14px;
+  }
+
+  @media (max-width: 600px) {
+    .hero h1 { font-size: 40px; }
+    .cta-group { flex-direction: column; align-items: center; }
+  }
+</style>
+</head>
+<body>
+
+  <nav>
+    <div class="logo">📖 Planner Pro</div>
+    <a href="login.html" class="launch-btn">Enter Workspace</a>
+  </nav>
+
+  <header class="hero">
+    <div class="hero-badge">🚀 V1.5 is Live! Now with Gemini AI</div>
+    <h1>The Ultimate Operating System for Students.</h1>
+    <p>Gamify your studies, track your habits, focus deeply with Pomodoro timers, and collaborate in live cloud study rooms. All powered by AI.</p>
+    <div class="cta-group">
+      <a href="login.html" class="launch-btn" style="font-size: 18px; padding: 14px 32px;">Launch Dashboard</a>
+    </div>
+  </header>
+
+  <section class="features">
+    <div class="feature-card">
+      <div class="feature-icon">🤖</div>
+      <h3>Pro AI Assistant</h3>
+      <p>Ask questions, summarize notes, and let Gemini organize your messy thoughts into a clear study plan in real-time.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">☁️</div>
+      <h3>Live Study Rooms</h3>
+      <p>Create a room, share the code, and sync up with friends. Features live chat, shared whiteboards, and resource vaults.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🎯</div>
+      <h3>Deep Focus Flow</h3>
+      <p>Customizable Pomodoro timers with built-in LoFi radio and Zen Mode to eliminate all distractions.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🏆</div>
+      <h3>RPG Gamification</h3>
+      <p>Earn XP for completing tasks, hitting hydration goals, and maintaining streaks. Climb the leaderboard to Grandmaster!</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🎮</div>
+      <h3>Brain Break Mini-Games</h3>
+      <p>Avoid burnout with quick mental resets. Play 2048, Memory Match, Speed Math, and Tic-Tac-Toe directly in the dashboard.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🌍</div>
+      <h3>Fully Localized</h3>
+      <p>Study in your preferred language with full native support for English, Spanish, French, Hindi, and Telugu.</p>
+    </div>
+  </section>
+
+  <footer>
+    <p>© 2026 Student Planner Pro. Built by Sathwik & Vishwas Akkenakunta.</p>
+  </footer>
+
+</body>
+</html>
