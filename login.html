@@ -61,121 +61,112 @@ input:focus { outline: none; border-color: var(--primary); background: transpare
   transition: transform 0.2s ease, background 0.15s ease; margin-bottom: 15px;
 }
 .add-btn:hover { transform: translateY(-2px); background: var(--primary-hover); }
-/* ─── SPLASH SCREEN VARIABLES & STYLES ─── */
-:root {
-  --bg: linear-gradient(135deg, #ff9a9e 0%, #fecfef 45%, #c3b1e1 75%, #a1c4fd 100%);
-  --primary: #6c63ff;
-  --sub: #5a6a7a;
-}
-
+/* ─── NEXT LEVEL SPLASH SCREEN (VIBRANT FIX) ─── */
 #splashScreen {
   position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-  background: var(--bg); background-size: 300% 300%;
+  /* Falls back to --bg-gradient if --bg isn't found (Fixes login.html) */
+  background: var(--bg, var(--bg-gradient)); 
+  background-size: 300% 300%;
+  animation: bgShift 15s ease infinite; 
+  color: var(--text);
   z-index: 999999; display: flex; flex-direction: column;
   align-items: center; justify-content: center;
-  transition: opacity 0.8s ease, visibility 0.8s;
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.8s;
   opacity: 1; visibility: visible;
-}
-.splash-logo {
-  font-size: 80px; margin-bottom: 20px;
-  filter: drop-shadow(0 4px 16px rgba(255,200,0,0.5));
-  animation: pulse 2s ease-in-out infinite;
-}
-.splash-version { 
-  position: absolute; bottom: 40px; font-weight: 800; font-size: 12px; 
-  color: var(--sub); letter-spacing: 2px; text-transform: uppercase; 
 }
 
-@keyframes pulse { 
-  0%,100%{transform:scale(1)} 
-  50%{transform:scale(1.05) rotate(-3deg)} 
-}
-/* ─── SPLASH SCREEN (DYNAMIC & PROFESSIONAL) ─── */
-#splashScreen {
-  position: fixed; 
-  top: 0; left: 0; width: 100%; height: 100%;
-  /* Use the app's dynamic moving background */
-  background: var(--bg); 
-  background-size: 300% 300%;
-  animation: bgShift 18s ease infinite; 
-  /* Use the app's dynamic text color */
-  color: var(--text); 
-  z-index: 999999; 
-  display: flex; flex-direction: column;
-  transition: opacity 0.8s ease, visibility 0.8s;
-  opacity: 1; visibility: visible;
+/* Changed from dark shadow to a bright, soft glow */
+.splash-overlay {
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+  background: radial-gradient(circle at center, rgba(255,255,255,0.4) 0%, transparent 100%);
+  z-index: 1;
 }
 
 .splash-content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  flex: 1; 
-  animation: subtleFadeIn 1.2s ease-out forwards;
+  position: relative; z-index: 2;
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; flex: 1;
+}
+
+.splash-logo-container {
+  position: relative; margin-bottom: 24px;
+  animation: floatLogo 3s ease-in-out infinite;
 }
 
 .splash-icon {
-  font-size: 54px;
-  margin-bottom: 16px;
-  /* A subtle shadow that matches the app's aesthetic */
-  filter: drop-shadow(0 4px 16px rgba(108,99,255,0.3)); 
+  font-size: 64px; position: relative; z-index: 2;
+  filter: drop-shadow(0 10px 20px rgba(0,0,0,0.1)); /* Softened shadow */
+}
+
+.splash-glow {
+  position: absolute; top: 50%; left: 50%; width: 80px; height: 80px;
+  background: var(--primary); border-radius: 50%;
+  transform: translate(-50%, -50%); filter: blur(30px);
+  opacity: 0.4; z-index: 1; animation: pulseGlow 2s ease-in-out infinite;
 }
 
 .splash-title {
-  font-size: 28px;
-  font-weight: 900; /* Matches your h2 tags */
-  letter-spacing: -0.5px;
-  margin-bottom: 6px;
-  font-family: var(--font);
+  font-size: 34px; font-weight: 900; letter-spacing: -1px; margin-bottom: 8px;
+  opacity: 0; animation: fadeUpIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.2s forwards;
+  color: var(--text);
 }
 
 .splash-tagline {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--sub); /* Hooks into your dynamic sub-text color */
-  margin-bottom: 32px;
+  font-size: 14px; font-weight: 700; color: var(--sub); opacity: 0;
+  margin-bottom: 40px; text-transform: uppercase; letter-spacing: 2px;
+  animation: fadeUpIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.4s forwards;
 }
 
-.splash-loading {
-  font-size: 12px;
-  font-weight: 800;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  color: var(--primary); /* Uses your primary accent color (Purple/Indigo) */
-  animation: subtleBlink 1.5s infinite;
+/* Sleek Progress Bar (Darkened track for visibility on light bg) */
+.splash-loader-bar {
+  width: 220px; height: 4px; background: rgba(0, 0, 0, 0.1);
+  border-radius: 10px; overflow: hidden; position: relative;
+  opacity: 0; animation: fadeUpIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.6s forwards;
+}
+
+.splash-loader-fill {
+  position: absolute; top: 0; left: 0; height: 100%; width: 0%;
+  background: linear-gradient(90deg, var(--secondary), var(--accent), var(--primary));
+  background-size: 200% 200%; border-radius: 10px;
+  animation: loadingBar 2.5s cubic-bezier(0.8, 0, 0.2, 1) infinite, bgShift 3s linear infinite;
+}
+
+.splash-loading-text {
+  margin-top: 15px; font-size: 11px; font-weight: 800; letter-spacing: 1.5px;
+  text-transform: uppercase; color: var(--sub); opacity: 0;
+  animation: fadeUpIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.7s forwards, subtleBlink 1.5s infinite 1.5s;
 }
 
 .splash-credit {
-  text-align: center;
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--sub);
-  padding-bottom: 30px;
-  letter-spacing: 0.5px;
-  animation: subtleFadeIn 1.5s ease-out forwards;
+  position: relative; z-index: 2; text-align: center; font-size: 12px; font-weight: 700;
+  color: var(--sub); padding-bottom: 30px; letter-spacing: 1px;
+  opacity: 0; animation: fadeUpIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.9s forwards;
 }
 
-/* Smooth, professional animations */
-@keyframes subtleFadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes subtleBlink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.4; }
-}
+/* Keyframes */
+@keyframes fadeUpIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes floatLogo { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+@keyframes pulseGlow { 0%, 100% { opacity: 0.2; transform: translate(-50%, -50%) scale(1); } 50% { opacity: 0.5; transform: translate(-50%, -50%) scale(1.2); } }
+@keyframes loadingBar { 0% { width: 0%; left: 0; } 50% { width: 100%; left: 0; } 100% { width: 0%; left: 100%; } }
+@keyframes subtleBlink { 0%, 100% { opacity: 0.9; } 50% { opacity: 0.4; } }
 </style>
 </head>
 
 <body>
 <div id="splashScreen">
+  <div class="splash-overlay"></div>
   <div class="splash-content">
-    <div class="splash-icon">📖</div>
+    <div class="splash-logo-container">
+      <div class="splash-icon">📖</div>
+      <div class="splash-glow"></div>
+    </div>
     <h1 class="splash-title">Student Planner Pro</h1>
-    <p class="splash-tagline">Your Daily Study Companion</p>
-    <div class="splash-loading">Loading...</div>
+    <p class="splash-tagline">Master Your Studies</p>
+    
+    <div class="splash-loader-bar">
+      <div class="splash-loader-fill"></div>
+    </div>
+    <div class="splash-loading-text">Initializing Workspace...</div>
   </div>
   <div class="splash-credit">Developed by Sathwik Akkenakunta</div>
 </div>
