@@ -3,7 +3,7 @@
 **Student Planner Pro** (also known as **Pro Study**) is a fully gamified, real-time productivity dashboard designed to transform the student experience. It combines deep focus tools, AI-powered assistance, and social collaboration into a sleek, modern web application.
 
 ## 🚀 Live Demo
-https://github.com/sathwikakkenakunta-ctrl/pro-study
+https://sathwikakkenakunta-ctrl.github.io/pro-study/
 
 ## ✨ Features
 
